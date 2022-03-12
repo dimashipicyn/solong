@@ -7,23 +7,34 @@
 #include "utils.h"
 
 
-char *texture_names[] = {
+const char *texture_paths[] = {
 	"../assets/wall_1.xpm",
 	"../assets/wall_2.xpm",
 	"../assets/wall_3.xpm",
 	"../assets/wall_4.xpm"
 };
 
+const char *texture_descriptions[] = {
+	"one wall",
+	"two wall",
+	"three wall",
+	"other wall"
+};
+
 void load_textures(t_game *game)
 {
-	int i = 0;
-	while (i < TOTAL_TEXTURES)
+	int i = -1;
+	while (++i < TOTAL_TEXTURES)
 	{
-		char *filename = texture_names[i];
+		const char *filename = texture_paths[i];
 
 		t_texture texture = {};
 		
 		texture.image = mlx_xpm_file_to_image(game->graphics->mlx, filename, &texture.width, &texture.height);
+		if (texture.image == NULL) {
+			printf("Could not load texture: %s, path: %s\n", texture_descriptions[i], filename);
+			continue;
+		}
 
 		int line_length = 0;
 		int endian = 0;
@@ -31,19 +42,8 @@ void load_textures(t_game *game)
 		texture.addr = mlx_get_data_addr(texture.image, &texture.bits_per_pixel, &line_length, &endian);
 
 		game->textures[i] = texture;
-		++i;
 	}
 }
-
-enum e_type {
-	WALL
-};
-
-typedef struct s_tile
-{
-	t_sprite sprite;
-	enum e_type type;
-} t_tile;
 
 void load_map(t_game *game)
 {
@@ -87,7 +87,7 @@ void load_map(t_game *game)
 
 	ft_list_clear(&list);
 
-	game->map = (t_map){map, width, height};
+	game->map = (t_game_map){map, width, height};
 }
 
 typedef struct s_pair {

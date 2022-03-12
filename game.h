@@ -6,7 +6,7 @@
 #include "keys.h"
 
 
-enum TEXTURE {
+enum TEXTURE_ID {
 	WALL_1 = 0,
 	WALL_2,
 	WALL_3,
@@ -14,12 +14,12 @@ enum TEXTURE {
     TOTAL_TEXTURES
 };
 
-typedef struct s_map
+typedef struct s_game_map
 {
 	char **data;
 	size_t width;
 	size_t height;
-} t_map;
+} t_game_map;
 
 typedef struct s_graphics t_graphics;
 typedef struct s_keys t_keys;
@@ -31,7 +31,7 @@ typedef struct s_game {
 	t_map		*settings;
     t_keys      keys;
     t_texture   textures[TOTAL_TEXTURES];
-    t_map       map;
+    t_game_map  map;
 } t_game;
 
 void load_textures(t_game *game);

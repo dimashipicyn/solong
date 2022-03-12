@@ -118,7 +118,7 @@ void render_map(t_game* game)
     size_t row;
     size_t col;
     size_t index;
-    t_map map = game->map;
+    t_game_map map = game->map;
 
     row = 0;
     while(row < map.height)

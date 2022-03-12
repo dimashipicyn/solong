@@ -9,10 +9,6 @@ int loop_callback(void* data)
     t_game* game = (t_game*)data;
     t_graphics* graphics = game->graphics;
 
-    //clear(graphics);
-
-    //t_sprite sprite = {&game->textures[WALL_1], {64,64,64,64}};
-    //draw_sprite_to_frame(game->graphics, sprite);
     render_map(game);
 
     render(graphics);
@@ -48,12 +44,19 @@ t_game* init_game()
 
     struct pair* w = map_find(game->settings, "resolution_width");
     struct pair* h = map_find(game->settings, "resolution_heigth");
-    size_t width = ft_atoi(w->val);
-    size_t heigth = ft_atoi(h->val);
+    size_t width = 0;
+    size_t heigth = 0;
+    
+    if (w && h) {
+        width = ft_atoi(w->val);
+        heigth = ft_atoi(h->val);
+    }
+    
     if (width == 0 || width > 1920 || heigth == 0 || heigth > 1080) {
         width = 800;
         heigth = 600;
     }
+    
     t_graphics* graphics = init_graphics(width, heigth, "so_long");
     if (!graphics) {
         free(game);
