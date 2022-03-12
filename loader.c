@@ -6,50 +6,11 @@
 #include "libft.h"
 #include "utils.h"
 
-
-const char *texture_paths[] = {
-	"../assets/wall_1.xpm",
-	"../assets/wall_2.xpm",
-	"../assets/wall_3.xpm",
-	"../assets/wall_4.xpm"
-};
-
-const char *texture_descriptions[] = {
-	"one wall",
-	"two wall",
-	"three wall",
-	"other wall"
-};
-
-void load_textures(t_game *game)
-{
-	int i = -1;
-	while (++i < TOTAL_TEXTURES)
-	{
-		const char *filename = texture_paths[i];
-
-		t_texture texture = {};
-		
-		texture.image = mlx_xpm_file_to_image(game->graphics->mlx, filename, &texture.width, &texture.height);
-		if (texture.image == NULL) {
-			printf("Could not load texture: %s, path: %s\n", texture_descriptions[i], filename);
-			continue;
-		}
-
-		int line_length = 0;
-		int endian = 0;
-
-		texture.addr = mlx_get_data_addr(texture.image, &texture.bits_per_pixel, &line_length, &endian);
-
-		game->textures[i] = texture;
-	}
-}
-
 void load_map(t_game *game)
 {
 	int fd;
 
-	fd = open("../map.ber", O_RDONLY);
+	fd = open("map.ber", O_RDONLY);
 	if (fd == -1)
 	{
 		ft_printf("Dont open map!\n");
@@ -144,7 +105,7 @@ void parse_config(t_game* game, t_list* config_file_data)
 
 void load_config(t_game *game)
 {
-	int fd = open("../config.yml", O_RDONLY);
+	int fd = open("config.yml", O_RDONLY);
 	if (fd == -1) {
 		ft_printf("Dont open config!\n");
 		exit(1);

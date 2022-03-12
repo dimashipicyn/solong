@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "game.h"
-#include "render.h"
+#include "graphics.h"
+#include "texture.h"
 #include "mlx.h"
 
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
@@ -117,7 +118,7 @@ void render_map(t_game* game)
 {
     size_t row;
     size_t col;
-    size_t index;
+    enum TEXTURE_ID id;
     t_game_map map = game->map;
 
     row = 0;
@@ -126,8 +127,8 @@ void render_map(t_game* game)
         col = 0;
         while (col < map.width)
         {
-            index = map.data[row][col] - '0';
-            draw_sprite_to_frame(game->graphics, (t_sprite){&game->textures[index], (t_rect){col * 64, row * 64, 64, 64}});
+            id = map.data[row][col] - '0';
+            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), (t_rect){col * 64, row * 64, 64, 64}});
             col++;
         }
         row++;

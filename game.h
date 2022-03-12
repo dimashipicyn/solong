@@ -2,17 +2,8 @@
 # define GAME_H
 
 #include <stddef.h>
-#include "render.h"
+#include "graphics.h"
 #include "keys.h"
-
-
-enum TEXTURE_ID {
-	WALL_1 = 0,
-	WALL_2,
-	WALL_3,
-	WALL_4,
-    TOTAL_TEXTURES
-};
 
 typedef struct s_game_map
 {
@@ -25,16 +16,16 @@ typedef struct s_graphics t_graphics;
 typedef struct s_keys t_keys;
 typedef struct s_texture t_texture;
 typedef struct s_map t_map;
+typedef struct s_player t_player;
 
 typedef struct s_game {
     t_graphics  *graphics;
 	t_map		*settings;
+	t_player	*player;
     t_keys      keys;
-    t_texture   textures[TOTAL_TEXTURES];
     t_game_map  map;
 } t_game;
 
-void load_textures(t_game *game);
 void load_map(t_game *game);
 void load_config(t_game *game);
 

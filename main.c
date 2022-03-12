@@ -3,6 +3,7 @@
 #include "game.h"
 #include "utils.h"
 #include "libft.h"
+#include "player.h"
 
 int loop_callback(void* data)
 {
@@ -10,7 +11,7 @@ int loop_callback(void* data)
     t_graphics* graphics = game->graphics;
 
     render_map(game);
-
+    game->player->interface.render(game->player, game->graphics);
     render(graphics);
     return 0;
 }
@@ -66,6 +67,8 @@ t_game* init_game()
 
     load_textures(game);
     load_map(game);
+    
+    game->player = new_player((t_point){2.5, 2.5}, (t_point){1, 0});
 
     return game;
 }

@@ -4,8 +4,10 @@ project(solong VERSION 0.1.0)
 add_executable(solong
     main.c
     keys.c
-    render.c
+    graphics.c
     loader.c
+    player.c
+    texture.c
     utils.c
 )
 
