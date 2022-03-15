@@ -12,6 +12,7 @@ int loop_callback(void* data)
 
     render_map(game);
     game->player->interface.render(game->player, game->graphics);
+    game->player->interface.input(game->player, game->keys);
     render(graphics);
     return 0;
 }

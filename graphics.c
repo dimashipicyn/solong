@@ -6,8 +6,8 @@
 
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
 {
-    register int *color = (texture->addr + (x * 4)
-                                     + (y * texture->width * 4)
+    register int *color = (texture->addr + (x * texture->bits_per_pixel)
+                                     + (y * texture->width * texture->bits_per_pixel)
                                      );
     return *color;
 }
@@ -29,15 +29,15 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
     float scalex = sprite.texture->width / (float)sprite.rect.width;
     float scaley = sprite.texture->height / (float)sprite.rect.height;
 
-    for (int y = 0; y < sprite.texture->height; ++y) {
+    for (int y = 0; y < sprite.rect.height; ++y) {
 
-        if (y < 0 || y > frame->height) {
+        if (y > frame->height) {
             continue;
         }
 
-        for (int x = 0; x < sprite.texture->width; ++x) {
+        for (int x = 0; x < sprite.rect.width; ++x) {
 
-            if (x < 0 || x > frame->width) {
+            if (x > frame->width) {
                 continue;
             }
 
@@ -128,7 +128,7 @@ void render_map(t_game* game)
         while (col < map.width)
         {
             id = map.data[row][col] - '0';
-            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), (t_rect){col * 64, row * 64, 64, 64}});
+            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), (t_rect){col * 32, row * 32, 32, 32}});
             col++;
         }
         row++;

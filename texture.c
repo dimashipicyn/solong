@@ -15,17 +15,17 @@ t_texture* get_texture(enum TEXTURE_ID id)
 
 char *texture_paths[] = {
 	// walls
-	//"assets/tiles/wall/wall_1.png",
-	//"assets/tiles/wall/wall_2.png",
-	//"assets/tiles/wall/wall_3.png",
-	//"assets/tiles/wall/wall_crack.png",
+	"assets/tiles/wall/wall_1.xpm",
+	"assets/tiles/wall/wall_2.xpm",
+	"assets/tiles/wall/wall_3.xpm",
+	"assets/tiles/wall/wall_crack.xpm",
 	// heroes
-	//"assets/heroes/knight/knight_idle_anim_f0.png"
-    "assets/wall_1.xpm",
-    "assets/wall_2.xpm",
-    "assets/wall_3.xpm",
-    "assets/wall_4.xpm",
-    "assets/sprite_1.xpm"
+	"assets/heroes/knight/knight_idle_anim_f0.xpm"
+    //"assets/wall_1.xpm",
+    //"assets/wall_2.xpm",
+    //"assets/wall_3.xpm",
+    //"assets/wall_4.xpm",
+    //"assets/sprite_1.xpm"
 };
 
 void load_textures(t_game* game)
@@ -52,7 +52,7 @@ void load_textures(t_game* game)
 		int endian = 0;
 
 		texture.addr = mlx_get_data_addr(texture.image, &texture.bits_per_pixel, &line_length, &endian);
-
+        texture.bits_per_pixel /= 8;
 		textures[i] = texture;
 	}
 }

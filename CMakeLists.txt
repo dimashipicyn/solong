@@ -62,4 +62,3 @@ target_include_directories(solong PUBLIC
     "${PROJECT_SOURCE_DIR}/lmlx"
     "${PROJECT_SOURCE_DIR}/lft"
 )
-
