@@ -14,26 +14,35 @@ t_texture* get_texture(enum TEXTURE_ID id)
 }
 
 char *texture_paths[] = {
+	// floors
+	"assets/tiles/floor/floor_5.xpm",
+
 	// walls
 	"assets/tiles/wall/wall_1.xpm",
-	"assets/tiles/wall/wall_2.xpm",
-	"assets/tiles/wall/wall_3.xpm",
-	"assets/tiles/wall/wall_crack.xpm",
+	"assets/tiles/wall/wall_top_1.xpm",
+	"assets/tiles/wall/wall_top_right.xpm",
+	"assets/tiles/wall/wall_top_left.xpm",
+	"assets/tiles/wall/wall_top_inner_right_2.xpm",
+	"assets/tiles/wall/wall_top_inner_left_2.xpm",
+
 	// heroes
 	"assets/heroes/knight/knight_idle_anim_f0.xpm"
-    //"assets/wall_1.xpm",
-    //"assets/wall_2.xpm",
-    //"assets/wall_3.xpm",
-    //"assets/wall_4.xpm",
-    //"assets/sprite_1.xpm"
 };
+
+const int MAX_SIZE_PATH = 256;
+
 
 void load_textures(t_game* game)
 {
+	char buffer[MAX_SIZE_PATH] = {0};
 	int i = -1;
 	while (++i < TOTAL_TEXTURES)
 	{
-		char *filename = texture_paths[i];
+		ft_memset(buffer, 0, MAX_SIZE_PATH);
+		ft_strlcat(buffer, "/Users/dmiitry/program/solong/", MAX_SIZE_PATH);
+		ft_strlcat(buffer, texture_paths[i], MAX_SIZE_PATH);
+		
+		char *filename = buffer;
 
 		t_texture texture = {};
 		

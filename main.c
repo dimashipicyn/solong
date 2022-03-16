@@ -10,6 +10,8 @@ int loop_callback(void* data)
     t_game* game = (t_game*)data;
     t_graphics* graphics = game->graphics;
 
+    //t_sprite sprite = {get_texture(0), {-5,-5,64,64}};
+    //draw_sprite_to_frame(graphics, sprite);
     render_map(game);
     game->player->interface.render(game->player, game->graphics);
     game->player->interface.input(game->player, game->keys);
@@ -74,7 +76,7 @@ t_game* init_game()
     return game;
 }
 
-int main() {
+int main(int ac, char** argv) {
     t_game* game = init_game();
     if (!game) {
         ft_printf("Could not init game!\n");

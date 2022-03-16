@@ -6,16 +6,16 @@
 void input_player(t_player* player, t_keys keys)
 {
     if (keys.forward) {
-        player->position.x += 0.1;
+        player->position.y -= 0.1;
     }
     if (keys.backward) {
+        player->position.y += 0.1;
+    }
+    if (keys.left_move) {
         player->position.x -= 0.1;
     }
-    if (keys.left) {
-        // do_someting
-    }
-    if (keys.right) {
-        // do_someting
+    if (keys.right_move) {
+        player->position.x += 0.1;
     }
 }
 
@@ -27,7 +27,7 @@ void update_player(t_player* player)
 void render_player(t_player* player, t_graphics* graphics)
 {
     // do_something
-    t_rect rect = {player->position.x * 32, player->position.y * 32, 64, 64};
+    t_rect rect = {player->position.x * 32, player->position.y * 32, 32, 32};
     t_sprite sprite = {get_texture(player->id), rect};
     draw_sprite_to_frame(graphics, sprite);
 }

@@ -23,30 +23,28 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 {
     t_texture* frame = graphics->frame;
 
-    int x_max = sprite.rect.x + sprite.rect.width;
-    int y_max = sprite.rect.y + sprite.rect.height;
+    int x_max = (sprite.rect.x + sprite.rect.width) < frame->width ? sprite.rect.width : frame->width - sprite.rect.x;
+    int y_max = (sprite.rect.y + sprite.rect.height) < frame->height ? sprite.rect.height : frame->height - sprite.rect.y;
 
-    float scalex = sprite.texture->width / (float)sprite.rect.width;
-    float scaley = sprite.texture->height / (float)sprite.rect.height;
+    int x_min = sprite.rect.x >= 0 ? 0 : -sprite.rect.x; //sprite.rect.width + sprite.rect.x;
+    int y_min = sprite.rect.y >= 0 ? 0 : -sprite.rect.y; //sprite.rect.height + sprite.rect.y;
+    
+    if (x_min < 0 || y_min < 0 || x_max < 0 || y_max < 0) {
+        return;
+    }
 
-    for (int y = 0; y < sprite.rect.height; ++y) {
+    float scale_x = sprite.texture->width / (float)sprite.rect.width;
+    float scale_y = sprite.texture->height / (float)sprite.rect.height;
 
-        if (y > frame->height) {
-            continue;
-        }
+    for (int y = y_min; y < y_max; ++y) {
 
-        for (int x = 0; x < sprite.rect.width; ++x) {
-
-            if (x > frame->width) {
-                continue;
-            }
-
+        for (int x = x_min; x < x_max; ++x) {
 
             // получаем нужный пиксель с учетом масштаба
-            int color = get_pixel_texture(sprite.texture, x * scalex, y * scaley);
+            int color = get_pixel_texture(sprite.texture, x * scale_x, y * scale_y);
 
             // черный цвет пропускаем
-            if (color == 0x0) {
+            if (color == 0x0 || color == 0x00FFFFFF) {
                 continue;
             }
             
@@ -128,6 +126,9 @@ void render_map(t_game* game)
         while (col < map.width)
         {
             id = map.data[row][col] - '0';
+            if (id != FLOOR_1) {
+                draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(FLOOR_1), (t_rect){col * 32, row * 32, 32, 32}});
+            }
             draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), (t_rect){col * 32, row * 32, 32, 32}});
             col++;
         }

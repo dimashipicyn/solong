@@ -2,11 +2,15 @@
 #define TEXTURE_H
 
 enum TEXTURE_ID {
+	// floors
+	FLOOR_1,
 	// walls
-	WALL_1 = 0,
+	WALL_1,
 	WALL_2,
 	WALL_3,
 	WALL_CRACK,
+	WALL_TOP_INNER_RIGHT,
+	WALL_TOP_INNER_LEFT,
 	// heroes
 	KNIGHT,
     TOTAL_TEXTURES

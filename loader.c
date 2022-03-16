@@ -10,7 +10,7 @@ void load_map(t_game *game)
 {
 	int fd;
 
-	fd = open("map.ber", O_RDONLY);
+	fd = open("../map.ber", O_RDONLY);
 	if (fd == -1)
 	{
 		ft_printf("Dont open map!\n");
@@ -105,7 +105,7 @@ void parse_config(t_game* game, t_list* config_file_data)
 
 void load_config(t_game *game)
 {
-	int fd = open("config.yml", O_RDONLY);
+	int fd = open("../config.yml", O_RDONLY);
 	if (fd == -1) {
 		ft_printf("Dont open config!\n");
 		exit(1);
