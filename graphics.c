@@ -23,34 +23,42 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 {
     t_texture* frame = graphics->frame;
 
-    int x_max = (sprite.rect.x + sprite.rect.width) < frame->width ? sprite.rect.width : frame->width - sprite.rect.x;
-    int y_max = (sprite.rect.y + sprite.rect.height) < frame->height ? sprite.rect.height : frame->height - sprite.rect.y;
+    int x_max = (sprite.dest.x + sprite.dest.width) < frame->width ? sprite.dest.width : frame->width - sprite.dest.x;
+    int y_max = (sprite.dest.y + sprite.dest.height) < frame->height ? sprite.dest.height : frame->height - sprite.dest.y;
 
-    int x_min = sprite.rect.x >= 0 ? 0 : -sprite.rect.x; //sprite.rect.width + sprite.rect.x;
-    int y_min = sprite.rect.y >= 0 ? 0 : -sprite.rect.y; //sprite.rect.height + sprite.rect.y;
+    int x_min = sprite.dest.x >= 0 ? 0 : -sprite.dest.x;
+    int y_min = sprite.dest.y >= 0 ? 0 : -sprite.dest.y;
     
     if (x_min < 0 || y_min < 0 || x_max < 0 || y_max < 0) {
         return;
     }
 
-    float scale_x = sprite.texture->width / (float)sprite.rect.width;
-    float scale_y = sprite.texture->height / (float)sprite.rect.height;
+    float scale_x = sprite.src.width / (float)sprite.dest.width;
+    float scale_y = sprite.src.height / (float)sprite.dest.height;
 
     for (int y = y_min; y < y_max; ++y) {
 
         for (int x = x_min; x < x_max; ++x) {
 
             // получаем нужный пиксель с учетом масштаба
-            int color = get_pixel_texture(sprite.texture, x * scale_x, y * scale_y);
+            int color = get_pixel_texture(sprite.texture, sprite.src.x + x * scale_x, sprite.src.y + y * scale_y);
 
             // черный цвет пропускаем
             if (color == 0x0 || color == 0x00FFFFFF) {
                 continue;
             }
             
-            set_pixel_texture(frame, x + sprite.rect.x, y + sprite.rect.y, color);
+            set_pixel_texture(frame, x + sprite.dest.x, y + sprite.dest.y, color);
         }
     }
+}
+
+void update_animation(t_animation* animation, int32_t elapsed_time)
+{
+    int32_t index = animation->nframes * animation->elapsed / animation->duration;
+    animation->sprite.src.x = index * animation->sprite.src.width;
+    animation->elapsed += elapsed_time;
+    animation->elapsed %= animation->duration;
 }
 
 void clear(t_graphics* graphics)
@@ -58,9 +66,10 @@ void clear(t_graphics* graphics)
     mlx_clear_window(graphics->mlx, graphics->window);
 }
 
-void render(t_graphics* graphics)
+void render_frame(t_graphics* graphics)
 {
     mlx_put_image_to_window(graphics->mlx, graphics->window, graphics->frame->image, 0, 0);
+    //mlx_do_sync(graphics->mlx);
 }
 
 t_graphics *init_graphics(int width, int height, char* title)
@@ -127,9 +136,9 @@ void render_map(t_game* game)
         {
             id = map.data[row][col] - '0';
             if (id != FLOOR_1) {
-                draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(FLOOR_1), (t_rect){col * 32, row * 32, 32, 32}});
+                draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(FLOOR_1), {col * 32, row * 32, 32, 32}, {0,0,16,16}});
             }
-            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), (t_rect){col * 32, row * 32, 32, 32}});
+            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), {col * 32, row * 32, 32, 32}, {0,0,16,16}});
             col++;
         }
         row++;

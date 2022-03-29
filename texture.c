@@ -26,7 +26,9 @@ char *texture_paths[] = {
 	"assets/tiles/wall/wall_top_inner_left_2.xpm",
 
 	// heroes
-	"assets/heroes/knight/knight_idle_anim_f0.xpm"
+	"assets/heroes/knight/knight_run_spritesheet.xpm",
+	"assets/heroes/knight/knight_idle_spritesheet.xpm",
+	"assets/digits.xpm"
 };
 
 const int MAX_SIZE_PATH = 256;

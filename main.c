@@ -1,21 +1,36 @@
-#include <stdlib.h>
 #include "mlx.h"
 #include "game.h"
 #include "utils.h"
 #include "libft.h"
 #include "player.h"
+#include "vector.h"
+#include "framerate.h"
+
+#include <stdlib.h>
+#include <time.h>
 
 int loop_callback(void* data)
 {
     t_game* game = (t_game*)data;
     t_graphics* graphics = game->graphics;
+    
+    int64_t start = get_time();
+    int64_t elapsed = start - game->previous_time;
+    game->previous_time = start;
+    game->lag += elapsed;
 
-    //t_sprite sprite = {get_texture(0), {-5,-5,64,64}};
-    //draw_sprite_to_frame(graphics, sprite);
+    while (game->lag > 5) {
+        game_object_input(game->player, game->keys);
+        game->lag -= 5;
+    }
+
+    game_object_update(game->player);
     render_map(game);
-    game->player->interface.render(game->player, game->graphics);
-    game->player->interface.input(game->player, game->keys);
-    render(graphics);
+    game_object_render(game->player, game->graphics, elapsed);
+    draw_framerate(game->graphics, elapsed);
+
+    render_frame(graphics);
+
     return 0;
 }
 
@@ -25,6 +40,7 @@ int close_game() {
 
 void loop(t_game* game)
 {
+    game->previous_time = get_time();
     mlx_hook(game->graphics->window, 2, 1L << 0, key_init, game);
     mlx_hook(game->graphics->window, 3, 1L << 1, key_destroy, game);
     mlx_hook(game->graphics->window, 17, 0, close_game, game);

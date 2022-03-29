@@ -9,6 +9,8 @@ add_executable(solong
     player.c
     texture.c
     utils.c
+    game_object.c
+    framerate.c
 )
 
 #MLX

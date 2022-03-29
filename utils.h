@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdint.h>
+
 typedef struct s_map t_map;
 typedef struct s_iter_map
 {
@@ -16,5 +18,8 @@ void init_iter_map(t_iter_map* iter, t_map* map);
 void iter_map_next(t_iter_map* iter);
 void* iter_map_get(t_iter_map* iter);
 int iter_map_end(t_iter_map* iter);
+
+
+int64_t get_time();
 
 #endif
