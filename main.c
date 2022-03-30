@@ -5,6 +5,7 @@
 #include "player.h"
 #include "vector.h"
 #include "framerate.h"
+#include "game_map.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -25,7 +26,8 @@ int loop_callback(void* data)
     }
 
     game_object_update(game->player);
-    render_map(game);
+
+    draw_game_map(game->map, game->graphics);
     game_object_render(game->player, game->graphics, elapsed);
     draw_framerate(game->graphics, elapsed);
 
@@ -85,7 +87,12 @@ t_game* init_game()
     game->graphics = graphics;
 
     load_textures(game);
-    load_map(game);
+    
+    game->map = new_game_map("map.ber");
+    if (!game->map) {
+        ft_printf("Could not load map!\n");
+        exit(1);
+    }
     
     game->player = new_player((t_point){2.5, 2.5}, (t_point){1, 0});
 

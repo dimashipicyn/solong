@@ -69,7 +69,7 @@ void clear(t_graphics* graphics)
 void render_frame(t_graphics* graphics)
 {
     mlx_put_image_to_window(graphics->mlx, graphics->window, graphics->frame->image, 0, 0);
-    //mlx_do_sync(graphics->mlx);
+    mlx_do_sync(graphics->mlx);
 }
 
 t_graphics *init_graphics(int width, int height, char* title)
@@ -119,28 +119,4 @@ t_graphics *init_graphics(int width, int height, char* title)
     };
 
     return graphics;
-}
-
-void render_map(t_game* game)
-{
-    size_t row;
-    size_t col;
-    enum TEXTURE_ID id;
-    t_game_map map = game->map;
-
-    row = 0;
-    while(row < map.height)
-    {
-        col = 0;
-        while (col < map.width)
-        {
-            id = map.data[row][col] - '0';
-            if (id != FLOOR_1) {
-                draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(FLOOR_1), {col * 32, row * 32, 32, 32}, {0,0,16,16}});
-            }
-            draw_sprite_to_frame(game->graphics, (t_sprite){get_texture(id), {col * 32, row * 32, 32, 32}, {0,0,16,16}});
-            col++;
-        }
-        row++;
-    }
 }

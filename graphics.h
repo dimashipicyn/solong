@@ -45,7 +45,6 @@ typedef struct s_game t_game;
 t_graphics*	init_graphics(int width, int height, char* title);
 void		draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite);
 void		render_frame(t_graphics* graphics);
-void        render_map(t_game* game);
 void        update_animation(t_animation* animation, int32_t elapsed_time);
 
 #endif

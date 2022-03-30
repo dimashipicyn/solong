@@ -11,6 +11,7 @@ add_executable(solong
     utils.c
     game_object.c
     framerate.c
+    game_map.c
 )
 
 #MLX

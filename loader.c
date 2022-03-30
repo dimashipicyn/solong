@@ -6,51 +6,6 @@
 #include "libft.h"
 #include "utils.h"
 
-void load_map(t_game *game)
-{
-	int fd;
-
-	fd = open("../map.ber", O_RDONLY);
-	if (fd == -1)
-	{
-		ft_printf("Dont open map!\n");
-		return;
-	}
-
-	t_list *list = NULL;
-	char *line = NULL;
-	
-	int res = get_next_line(fd, &line);
-	while (res > 0)
-	{
-		ft_list_push_back(&list, line);
-		res = get_next_line(fd, &line);
-	}
-	ft_list_push_back(&list, line);
-
-
-	size_t height = ft_list_size(list);
-	size_t width = ft_strlen(list->content);
-	char **map = calloc(height + 1, sizeof(char*));
-
-	ft_printf("map w %d, h %d\n", width, height);
-
-	t_list *it_list = list;
-	char **it_map = map;
-	while (it_list)
-	{
-		*it_map = it_list->content;
-
-		it_map++;
-		it_list = it_list->next;
-	}
-	*it_map = NULL;
-
-	ft_list_clear(&list);
-
-	game->map = (t_game_map){map, width, height};
-}
-
 typedef struct s_pair {
 	char* key;
 	char* value;
