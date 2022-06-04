@@ -2,13 +2,15 @@
 #include "game.h"
 #include "utils.h"
 #include "libft.h"
-#include "player.h"
+#include "tank.h"
 #include "vector.h"
 #include "framerate.h"
 #include "game_map.h"
 
 #include <stdlib.h>
 #include <time.h>
+
+t_list *entities = NULL;
 
 int loop_callback(void* data)
 {
@@ -21,14 +23,21 @@ int loop_callback(void* data)
     game->lag += elapsed;
 
     while (game->lag > 5) {
-        game_object_input(game->player, game->keys);
+        for (t_list* it = entities; it != NULL; it = it->next) {
+            game_object_input(it->content, game->keys);
+        }
         game->lag -= 5;
     }
 
-    game_object_update(game->player);
+    ft_list_foreach(entities, game_object_update);
+    update_physic_world(game->ph_world);
 
     draw_game_map(game->map, game->graphics);
-    game_object_render(game->player, game->graphics, elapsed);
+    
+    for (t_list* it = entities; it != NULL; it = it->next) {
+        game_object_render(it->content, game->graphics, elapsed);
+    }
+    
     draw_framerate(game->graphics, elapsed);
 
     render_frame(graphics);
@@ -93,8 +102,15 @@ t_game* init_game()
         ft_printf("Could not load map!\n");
         exit(1);
     }
-    
-    game->player = new_player((t_point){2.5, 2.5}, (t_point){1, 0});
+    game->ph_world = new_physic_world();
+    t_physic_body* tank_body = new_physic_body((t_vector){{100,100},{32,32}}, 0, RIGHT);
+    t_physic_body* w_body = new_physic_body((t_vector){{0,32},{32,32}}, 0, RIGHT);
+
+    add_body(game->ph_world, tank_body);
+    add_body(game->ph_world, w_body);
+
+    ft_list_push_back(&entities, new_player(tank_body));
+    //ft_list_push_back(&entities, new_player((t_point){100, 100}, RIGHT));
 
     return game;
 }

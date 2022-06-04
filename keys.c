@@ -1,6 +1,16 @@
 #include "keys.h"
 #include "game.h"
 
+# define STEP_TURN 0.03
+# define STEP_MOVE 0.1
+# define ESC 53
+# define W 13
+# define A 0
+# define S 1
+# define D 2
+# define LEFT 123
+# define RIGHT 124
+
 int			key_init(int keycode, t_game* game)
 {
 	t_keys* keys = &game->keys;

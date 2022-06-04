@@ -28,7 +28,8 @@ char *texture_paths[] = {
 	// heroes
 	"assets/heroes/knight/knight_run_spritesheet.xpm",
 	"assets/heroes/knight/knight_idle_spritesheet.xpm",
-	"assets/digits.xpm"
+	"assets/digits.xpm",
+	"assets/battle_city.xpm"
 };
 
 const int MAX_SIZE_PATH = 256;

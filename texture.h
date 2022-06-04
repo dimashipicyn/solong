@@ -16,6 +16,7 @@ enum TEXTURE_ID {
 	KNIGHT_IDLE,
 	// digits
 	DIGITS,
+	TANK,
     TOTAL_TEXTURES
 };
 

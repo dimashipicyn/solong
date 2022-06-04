@@ -44,7 +44,7 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
             int color = get_pixel_texture(sprite.texture, sprite.src.x + x * scale_x, sprite.src.y + y * scale_y);
 
             // черный цвет пропускаем
-            if (color == 0x0 || color == 0x00FFFFFF) {
+            if (color == 0x00FFFFFF || color == 0x00000001) {
                 continue;
             }
             
@@ -56,7 +56,7 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 void update_animation(t_animation* animation, int32_t elapsed_time)
 {
     int32_t index = animation->nframes * animation->elapsed / animation->duration;
-    animation->sprite.src.x = index * animation->sprite.src.width;
+    animation->sprite.src.x = index * animation->sprite.src.width + animation->sprite.src.x;
     animation->elapsed += elapsed_time;
     animation->elapsed %= animation->duration;
 }
@@ -69,7 +69,7 @@ void clear(t_graphics* graphics)
 void render_frame(t_graphics* graphics)
 {
     mlx_put_image_to_window(graphics->mlx, graphics->window, graphics->frame->image, 0, 0);
-    mlx_do_sync(graphics->mlx);
+    //mlx_do_sync(graphics->mlx);
 }
 
 t_graphics *init_graphics(int width, int height, char* title)
