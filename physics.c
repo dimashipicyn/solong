@@ -2,6 +2,16 @@
 
 #include <stdlib.h>
 
+static t_physic_world physic_world = {};
+
+static int cmp(void* t, void* p)
+{
+    if (t == p) {
+        return 0;
+    }
+    return 1;
+}
+
 static int intersect(t_physic_body* lhs, t_physic_body* rhs)
 {
     float ax = lhs->body.a.x;
@@ -35,43 +45,18 @@ void free_physic_world(t_physic_world* w)
     free(w);
 }
 
-void add_body(t_physic_world* w, t_physic_body* b)
+void update_physic_world()
 {
-    ft_list_push_back(&w->bodies, b);
-}
+    t_physic_world *w = &physic_world;
 
-static int update_body(t_physic_body* b)
-{
-    float velocity = b->velocity;
-    switch (b->dir) {
-        case FORW: {
-            b->body.a.y -= velocity;
-            return 1;
-        }
-        case BACK: {
-            b->body.a.y += velocity;
-            return 1;
-        }
-        case LEFT: {
-            b->body.a.x -= velocity;
-            return 1;
-        }
-        case RIGHT: {
-            b->body.a.x += velocity;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void update_physic_world(t_physic_world* w)
-{
     for (t_list* it1 = w->bodies; it1 != NULL; it1 = it1->next)
     {
         t_physic_body temp_body = *(t_physic_body*)it1->content;
-        if (update_body(&temp_body) == 0) {
+        if (temp_body.velocity == 0) {
             continue;
         }
+
+        temp_body.body.a = vec2_add(temp_body.body.a, vec2_scalar_num(temp_body.dir, temp_body.velocity));
 
         int is_detect_collision = 0;
         for (t_list* it2 = w->bodies; it2 != NULL; it2 = it2->next) {
@@ -84,24 +69,30 @@ void update_physic_world(t_physic_world* w)
             }
         }
 
-        if (!is_detect_collision) {
+        if (!is_detect_collision || !temp_body.stop_on_contact) {
             *(t_physic_body*)it1->content = temp_body;
+            ((t_physic_body*)it1->content)->contact = is_detect_collision;
         }
     }
 }
 
-t_physic_body* new_physic_body(t_vector body, float velocity, t_direction dir)
+t_physic_body* new_physic_body(t_vec2 pos, t_vec2 size, float velocity, t_vec2 dir)
 {
     t_physic_body* b = calloc(1, sizeof(t_physic_body));
 
-    b->body = body;
+    b->body = (t_body_rect){pos, size};
     b->velocity = velocity;
     b->dir = dir;
+    b->stop_on_contact = 1;
+    b->contact = 0;
+
+    ft_list_push_back(&physic_world.bodies, b);
 
     return b;
 }
 
 void free_physic_body(t_physic_body* b)
 {
+    ft_list_remove_if(&physic_world.bodies, b, cmp);
     free(b);
 }

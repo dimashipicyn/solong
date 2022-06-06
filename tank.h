@@ -12,7 +12,6 @@ typedef struct s_tank
     t_game_object   *interface;
     t_physic_body   *body;
     t_animation     anim;
-    float           velocity;
     int             is_fired;
 } t_tank;
 

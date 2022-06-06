@@ -23,24 +23,25 @@ static void input(t_bullet* bullet, t_keys keys)
 
 static void update(t_bullet* bullet)
 {
-    if (bullet->dir == FORW) {
-        bullet->pos.y -= bullet->velocity;
+    t_vec2 dir = bullet->body->dir;
+    t_vec2 pos = bullet->body->body.a;
+
+    if (dir.y == -1) {
         bullet->sprite.src.x = 0;
     }
-    if (bullet->dir == BACK) {
-        bullet->pos.y += bullet->velocity;
+    if (dir.y == 1) {
         bullet->sprite.src.x = 64;
     }
-    if (bullet->dir == LEFT) {
-        bullet->pos.x -= bullet->velocity;
+    if (dir.x == -1) {
         bullet->sprite.src.x = 32;
     }
-    if (bullet->dir == RIGHT) {
-        bullet->pos.x += bullet->velocity;
+    if (dir.x == 1) {
         bullet->sprite.src.x = 96;
     }
 
-    if (bullet->pos.x < -32 || bullet->pos.x > 1000 || bullet->pos.y < -32 || bullet->pos.y > 1000) {
+    char contact = bullet->body->contact;
+
+    if (contact || pos.x < -32 || pos.x > 1000 || pos.y < -32 || pos.y > 1000) {
         bullet->owner->is_fired = 0;
         ft_list_remove_if(&entities, bullet, cmp);
     }
@@ -49,8 +50,8 @@ static void update(t_bullet* bullet)
 static void draw(t_bullet* bullet, t_graphics* graphics, int32_t elapsed)
 {
     t_sprite s = bullet->sprite;
-    s.dest.x = bullet->pos.x;
-    s.dest.y = bullet->pos.y;
+    s.dest.x = bullet->body->body.a.x;
+    s.dest.y = bullet->body->body.a.y;
 
     draw_sprite_to_frame(graphics, s);
 }
@@ -61,18 +62,18 @@ static t_game_object interface = {
     .render = draw
 };
 
-t_bullet* new_bullet(t_point pos, t_direction dir, float velocity, t_tank* owner)
+t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
 {
     t_bullet* bullet = calloc(1, sizeof(t_bullet));
+    t_physic_body* body = new_physic_body(pos, vec2(6,6), velocity, dir);
+    body->stop_on_contact = 0;
 
     bullet->interface = &interface;
-    bullet->dir = dir;
-    bullet->pos = pos;
-    bullet->velocity = velocity;
     bullet->owner = owner;
+    bullet->body = body;
 
     bullet->sprite.texture = get_texture(TANK);
-    bullet->sprite.dest = (t_rect){pos.x, pos.y, 16, 16};
+    bullet->sprite.dest = (t_rect){pos.x, pos.y, 6, 6};
     bullet->sprite.src = (t_rect){0, 0, 16, 16};
 
     return bullet;

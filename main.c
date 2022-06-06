@@ -102,12 +102,9 @@ t_game* init_game()
         ft_printf("Could not load map!\n");
         exit(1);
     }
-    game->ph_world = new_physic_world();
-    t_physic_body* tank_body = new_physic_body((t_vector){{100,100},{32,32}}, 0, RIGHT);
-    t_physic_body* w_body = new_physic_body((t_vector){{0,32},{32,32}}, 0, RIGHT);
-
-    add_body(game->ph_world, tank_body);
-    add_body(game->ph_world, w_body);
+    //game->ph_world = new_physic_world();
+    t_physic_body* tank_body = new_physic_body(vec2(100,100), vec2(30,30), 0, vec2(0, 1));
+    t_physic_body* w_body = new_physic_body(vec2(32,32), vec2(32,32), 0, vec2(0, 0));
 
     ft_list_push_back(&entities, new_player(tank_body));
     //ft_list_push_back(&entities, new_player((t_point){100, 100}, RIGHT));

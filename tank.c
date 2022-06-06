@@ -6,47 +6,31 @@
 
 extern t_list *entities;
 
-// typedef struct s_tank_state {
-//     t_animation animation;
-// } t_player_state;
-
-// static t_tank_state idle = {
-//     .animation = (t_animation){
-//         .duration = 500,
-//         .nframes = 1
-//     }
-// };
-
-// static t_tank_state run = {
-//     .animation = (t_animation){
-//         .duration = 150,
-//         .nframes = 2
-//     }
-// };
-
 void input_player(t_tank* player, t_keys keys)
 {
     player->body->velocity = 0;
     if (keys.forward) {
         player->body->velocity = 0.5;
-        player->body->dir = FORW;
+        player->body->dir = vec2(0, -1);
     }
     else if (keys.backward) {
         player->body->velocity = 0.5;
-        player->body->dir = BACK;
+        player->body->dir = vec2(0, 1);
     }
     else if (keys.left_move) {
         player->body->velocity = 0.5;
-        player->body->dir = LEFT;
+        player->body->dir = vec2(-1, 0);
     }
     else if (keys.right_move) {
         player->body->velocity = 0.5;
-        player->body->dir = RIGHT;
+        player->body->dir = vec2(1, 0);
     }
 
     if (keys.left) {
         if (!player->is_fired) {
-            ft_list_push_back(&entities, new_bullet((t_point){player->body->body.a.x + 8, player->body->body.a.y + 8}, player->body->dir, 1.5, player));
+            t_vec2 bullet_pos = vec2(player->body->body.a.x + 12, player->body->body.a.y + 12);
+            t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(player->body->dir, 18));
+            ft_list_push_back(&entities, new_bullet(pos, player->body->dir, 1.5, player));
             player->is_fired = 1;
         }
     }
@@ -54,16 +38,16 @@ void input_player(t_tank* player, t_keys keys)
 
 void update_player(t_tank* player)
 {
-    if (player->body->dir == FORW) {
+    if (player->body->dir.y == -1) {
         player->anim.sprite.src.x = 0;
     }
-    if (player->body->dir == BACK) {
+    if (player->body->dir.y == 1) {
         player->anim.sprite.src.x = 64;
     }
-    if (player->body->dir == LEFT) {
+    if (player->body->dir.x == -1) {
         player->anim.sprite.src.x = 32;
     }
-    if (player->body->dir == RIGHT) {
+    if (player->body->dir.x == 1) {
         player->anim.sprite.src.x = 96;
     }
 
@@ -98,7 +82,7 @@ void init_player(t_tank* player, t_physic_body* body)
 
     t_texture* texture = get_texture(TANK);
 
-    t_point pos = body->body.a;
+    t_vec2 pos = body->body.a;
 
     player->anim = (t_animation){
         .duration = 200,

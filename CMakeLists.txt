@@ -14,6 +14,7 @@ add_executable(solong
     game_map.c
     bullet.c
     physics.c
+    vector.c
 )
 
 #MLX
