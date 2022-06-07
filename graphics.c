@@ -1,8 +1,10 @@
-#include <stdlib.h>
 #include "game.h"
 #include "graphics.h"
 #include "texture.h"
 #include "mlx.h"
+
+#include <stdlib.h>
+#include <math.h>
 
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
 {
@@ -17,6 +19,35 @@ static inline void set_pixel_texture(t_texture *texture, int x, int y, int color
     *(int *)(texture->addr + (x * 4)
                            + (y * texture->width * 4)
                            ) = color;
+}
+
+void draw_line_to_frame(t_graphics* grapics, t_line line)
+{
+    int dx = fabs(line.a.x - line.b.x);
+    int dy = fabs(line.a.y - line.b.y);
+    int y = line.a.y;
+    int e = -2 * dx;
+    for(int x = line.a.x ; x <= line.b.x ; ++x) {
+        set_pixel_texture(grapics->frame, x, y, 0x0089ff89);
+        e += 2 * dy;
+        if(e > 0) ++y;
+        if(e >= dx) e -= 2 * dx;
+    }    
+}
+
+void        draw_rect_to_frame(t_graphics* grapics, t_rect rect)
+{
+
+}
+
+void        draw_circle_to_frame(t_graphics* grapics, t_circle circle)
+{
+
+}
+
+void        draw_triangle_to_frame(t_graphics* grapics, t_triangle triangle)
+{
+    
 }
 
 void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
@@ -69,7 +100,7 @@ void clear(t_graphics* graphics)
 void render_frame(t_graphics* graphics)
 {
     mlx_put_image_to_window(graphics->mlx, graphics->window, graphics->frame->image, 0, 0);
-    //mlx_do_sync(graphics->mlx);
+    mlx_do_sync(graphics->mlx);
 }
 
 t_graphics *init_graphics(int width, int height, char* title)

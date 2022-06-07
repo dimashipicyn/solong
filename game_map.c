@@ -2,28 +2,43 @@
 #include "libft.h"
 #include "graphics.h"
 #include "texture.h"
+#include "physics.h"
 
 #include <stdlib.h>
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+typedef enum {
+    EMPTY,
+    BRICK,
+    CONCRETE,
+    WATER,
+    FOREST,
+    TILE_TYPE_SIZE
+} t_tile_type;
+
 typedef struct s_terrain
 {
-    t_texture* texture;
-    int32_t movementCost;
-    int8_t isWater;
+    t_tile_type     type;
+    t_physic_body*  body;
 } t_terrain;
 
-t_terrain wall;
-t_terrain flor;
+static t_texture* textures[TILE_TYPE_SIZE] = {};
 
 typedef struct s_game_map
 {
-	t_terrain** tiles;
-	uint32_t width;
-	uint32_t height;
+	t_terrain*  tiles;
+	int32_t     width;
+	int32_t     height;
 } t_game_map;
+
+void set_empty_terrain(t_terrain* terrain)
+{
+    free_physic_body(terrain->body);
+    terrain->body = NULL;
+    terrain->type = EMPTY;
+}
 
 static int load_map(t_game_map* map, char* filename);
 
@@ -35,18 +50,13 @@ t_game_map* new_game_map(char* filename)
         free(map);
         return NULL;
     }
-    wall.texture = get_texture(WALL_1);
-    flor.texture = get_texture(FLOOR_1);
+    textures[EMPTY] = get_texture(FLOOR_1);
+    textures[BRICK] = get_texture(WALL_1);
     return map;
 }
 
 void delete_game_map(t_game_map* game_map)
 {
-    t_terrain** tiles = game_map->tiles;
-    while (*tiles) {
-        free(*tiles);
-        ++tiles;
-    }
     free(game_map->tiles);
     free(game_map);
 }
@@ -81,26 +91,40 @@ static int load_map(t_game_map* map, char* filename)
 
 	size_t height = ft_list_size(list);
 	size_t width = ft_strlen(list->content);
-	t_terrain** tiles = calloc(height * width + 1, sizeof(void*));
+	t_terrain* tiles = calloc(height * width, sizeof(t_terrain));
+
+    size_t x = 0;
+    size_t y = 0;
 
 	t_list* it_list = list;
-	t_terrain** it_tiles = tiles;
+	t_terrain* it_tiles = tiles;
 	while (it_list)
 	{
         char* row = it_list->content;
+        x = 0;
 		while (*row) {
-            uint8_t index = *row - '0';
-            if (index == 0)
-                *it_tiles = &wall;
-            if (index == 1)
-                *it_tiles = &flor;
+            t_tile_type type = *row - '0';
+            
+            *it_tiles = (t_terrain){
+                .type = type,
+                .body = NULL
+            };
+            if (type == BRICK) {
+                t_physic_body_def def = {
+                    .pos = vec2(x * 32, y * 32),
+                    .size = vec2(32,32),
+                    .user_data = it_tiles
+                };
+                it_tiles->body = create_physic_body(def);
+            }
             
             ++row;
             ++it_tiles;
+            x++;
         }
 		it_list = it_list->next;
+        y++;
 	}
-	*it_tiles = NULL;
 
 	ft_list_clear(&list);
 
@@ -114,7 +138,7 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
 {
     size_t row;
     size_t col;
-    t_terrain** tiles;
+    t_terrain* tiles;
 
     row = 0;
     tiles = game_map->tiles;
@@ -123,8 +147,9 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
         col = 0;
         while (col < game_map->width)
         {
-            t_terrain* terrain = tiles[row * game_map->width + col];
-            draw_sprite_to_frame(graphics, (t_sprite){terrain->texture, {col * 32, row * 32, 32, 32}, {0,0,16,16}});
+            t_terrain terrain = tiles[row * game_map->width + col];
+            t_texture* txr = textures[terrain.type];
+            draw_sprite_to_frame(graphics, (t_sprite){txr, {col * 32, row * 32, 32, 32}, {0,0,16,16}});
             col++;
         }
         row++;

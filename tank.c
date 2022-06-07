@@ -3,8 +3,21 @@
 #include "graphics.h"
 #include "libft.h"
 #include "bullet.h"
+#include "utils.h"
 
 extern t_list *entities;
+
+static void fire(t_tank* tank)
+{
+    int64_t diff_time = get_time() - tank->last_fire_time;
+    if (diff_time >= 1000 * 1) {
+        t_vec2 bullet_pos = vec2(tank->body->body.a.x + 10, tank->body->body.a.y + 10);
+        t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 17));
+        ft_list_push_back(&entities, new_bullet(pos, tank->body->dir, 1, tank));
+
+        tank->last_fire_time = get_time();
+    }
+}
 
 void input_player(t_tank* player, t_keys keys)
 {
@@ -27,12 +40,7 @@ void input_player(t_tank* player, t_keys keys)
     }
 
     if (keys.left) {
-        if (!player->is_fired) {
-            t_vec2 bullet_pos = vec2(player->body->body.a.x + 12, player->body->body.a.y + 12);
-            t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(player->body->dir, 18));
-            ft_list_push_back(&entities, new_bullet(pos, player->body->dir, 1.5, player));
-            player->is_fired = 1;
-        }
+        fire(player);
     }
 }
 
@@ -63,8 +71,8 @@ void render_player(t_tank* player, t_graphics* graphics, int32_t elapsed)
 {
     update_animation(&player->anim, elapsed);
     t_sprite s = player->anim.sprite;
-    s.dest.x = player->body->body.a.x;
-    s.dest.y = player->body->body.a.y;
+    s.dest.x = player->body->body.a.x - 2;
+    s.dest.y = player->body->body.a.y - 2;
     draw_sprite_to_frame(graphics, s);
 }
 
@@ -78,7 +86,6 @@ void init_player(t_tank* player, t_physic_body* body)
 {
     player->interface = &interface;
     player->body = body;
-    player->is_fired = 0;
 
     t_texture* texture = get_texture(TANK);
 

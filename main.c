@@ -22,15 +22,15 @@ int loop_callback(void* data)
     game->previous_time = start;
     game->lag += elapsed;
 
-    while (game->lag > 5) {
-        for (t_list* it = entities; it != NULL; it = it->next) {
-            game_object_input(it->content, game->keys);
-        }
-        game->lag -= 5;
+    for (t_list* it = entities; it != NULL; it = it->next) {
+        game_object_input(it->content, game->keys);
     }
 
-    ft_list_foreach(entities, game_object_update);
-    update_physic_world(game->ph_world);
+    while (game->lag > 5) {
+        ft_list_foreach(entities, game_object_update);
+        update_physic_world(game->ph_world);
+        game->lag -= 5;
+    }
 
     draw_game_map(game->map, game->graphics);
     
@@ -102,12 +102,16 @@ t_game* init_game()
         ft_printf("Could not load map!\n");
         exit(1);
     }
-    //game->ph_world = new_physic_world();
-    t_physic_body* tank_body = new_physic_body(vec2(100,100), vec2(30,30), 0, vec2(0, 1));
-    t_physic_body* w_body = new_physic_body(vec2(32,32), vec2(32,32), 0, vec2(0, 0));
+
+    t_physic_body_def def = {
+        .pos = vec2(100,100),
+        .size = vec2(28,28),
+        .dir = vec2(0, 1),
+        .is_dynamic = 1
+    };
+    t_physic_body* tank_body = create_physic_body(def);
 
     ft_list_push_back(&entities, new_player(tank_body));
-    //ft_list_push_back(&entities, new_player((t_point){100, 100}, RIGHT));
 
     return game;
 }

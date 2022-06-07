@@ -3,6 +3,7 @@
 #include "texture.h"
 #include "tank.h"
 #include "libft.h"
+#include "game_map.h"
 
 #include <stdlib.h>
 
@@ -42,7 +43,8 @@ static void update(t_bullet* bullet)
     char contact = bullet->body->contact;
 
     if (contact || pos.x < -32 || pos.x > 1000 || pos.y < -32 || pos.y > 1000) {
-        bullet->owner->is_fired = 0;
+        set_empty_terrain(bullet->body->contacted_body->user_data);
+        free_bullet(bullet);
         ft_list_remove_if(&entities, bullet, cmp);
     }
 }
@@ -65,7 +67,15 @@ static t_game_object interface = {
 t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
 {
     t_bullet* bullet = calloc(1, sizeof(t_bullet));
-    t_physic_body* body = new_physic_body(pos, vec2(6,6), velocity, dir);
+
+    t_physic_body_def def = {
+        .pos = pos,
+        .size = vec2(6,6),
+        .dir = dir,
+        .velocity = velocity,
+        .is_dynamic = 1
+    };
+    t_physic_body* body = create_physic_body(def);
     body->stop_on_contact = 0;
 
     bullet->interface = &interface;
@@ -81,5 +91,6 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
 
 void free_bullet(t_bullet* bullet)
 {
+    free_physic_body(bullet->body);
     free(bullet);
 }
