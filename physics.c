@@ -48,7 +48,7 @@ void free_physic_world(t_physic_world* w)
     free(w);
 }
 
-void update_physic_world()
+void step_physic_world()
 {
     t_physic_world *w = &physic_world;
 

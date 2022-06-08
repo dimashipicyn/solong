@@ -5,14 +5,7 @@
 
 #include <stdint.h>
 
-typedef struct s_texture {
-    void* image;
-    void* addr;
-
-    int width;
-    int height;
-    int bits_per_pixel;
-} t_texture;
+typedef struct s_texture t_texture;
 
 typedef struct s_graphics {
     void* mlx;

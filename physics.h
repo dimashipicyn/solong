@@ -40,7 +40,7 @@ typedef struct s_physic_world
 
 t_physic_world*     new_physic_world();
 void                free_physic_world(t_physic_world* w);
-void                update_physic_world();
+void                step_physic_world();
 
 t_physic_body*      create_physic_body(t_physic_body_def def);
 void                free_physic_body(t_physic_body* b);

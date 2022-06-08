@@ -15,6 +15,7 @@ typedef enum {
     CONCRETE,
     WATER,
     FOREST,
+    ICE,
     TILE_TYPE_SIZE
 } t_tile_type;
 
@@ -24,7 +25,7 @@ typedef struct s_terrain
     t_physic_body*  body;
 } t_terrain;
 
-static t_texture* textures[TILE_TYPE_SIZE] = {};
+static t_sprite sprites[TILE_TYPE_SIZE] = {};
 
 typedef struct s_game_map
 {
@@ -50,8 +51,12 @@ t_game_map* new_game_map(char* filename)
         free(map);
         return NULL;
     }
-    textures[EMPTY] = get_texture(FLOOR_1);
-    textures[BRICK] = get_texture(WALL_1);
+    sprites[EMPTY] = (t_sprite){get_texture(DIRT_TXR_ID), {0,0,16,16}, {0,0,16,16}};
+    sprites[BRICK] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {0,0,8,8}};
+    sprites[CONCRETE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {8,0,8,8}};
+    sprites[FOREST] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {16,0,8,8}};
+    sprites[ICE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
+    sprites[WATER] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
     return map;
 }
 
@@ -111,8 +116,8 @@ static int load_map(t_game_map* map, char* filename)
             };
             if (type == BRICK) {
                 t_physic_body_def def = {
-                    .pos = vec2(x * 32, y * 32),
-                    .size = vec2(32,32),
+                    .pos = vec2(x * 16, y * 16),
+                    .size = vec2(16,16),
                     .user_data = it_tiles
                 };
                 it_tiles->body = create_physic_body(def);
@@ -148,8 +153,10 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
         while (col < game_map->width)
         {
             t_terrain terrain = tiles[row * game_map->width + col];
-            t_texture* txr = textures[terrain.type];
-            draw_sprite_to_frame(graphics, (t_sprite){txr, {col * 32, row * 32, 32, 32}, {0,0,16,16}});
+            t_sprite sprite = sprites[terrain.type];
+            sprite.dest.x = col * sprite.dest.width;
+            sprite.dest.y = row * sprite.dest.height;
+            draw_sprite_to_frame(graphics, sprite);
             col++;
         }
         row++;

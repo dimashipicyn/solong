@@ -31,13 +31,13 @@ static void update(t_bullet* bullet)
         bullet->sprite.src.x = 0;
     }
     if (dir.y == 1) {
-        bullet->sprite.src.x = 64;
+        bullet->sprite.src.x = 8;
     }
     if (dir.x == -1) {
-        bullet->sprite.src.x = 32;
+        bullet->sprite.src.x = 4;
     }
     if (dir.x == 1) {
-        bullet->sprite.src.x = 96;
+        bullet->sprite.src.x = 12;
     }
 
     char contact = bullet->body->contact;
@@ -70,7 +70,7 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
 
     t_physic_body_def def = {
         .pos = pos,
-        .size = vec2(6,6),
+        .size = vec2(4,4),
         .dir = dir,
         .velocity = velocity,
         .is_dynamic = 1
@@ -82,9 +82,9 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
     bullet->owner = owner;
     bullet->body = body;
 
-    bullet->sprite.texture = get_texture(TANK);
+    bullet->sprite.texture = get_texture(BULLET_TXR_ID);
     bullet->sprite.dest = (t_rect){pos.x, pos.y, 6, 6};
-    bullet->sprite.src = (t_rect){0, 0, 16, 16};
+    bullet->sprite.src = (t_rect){0, 0, 4, 4};
 
     return bullet;
 }

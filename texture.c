@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include "libft.h"
 #include "mlx.h"
 
@@ -6,65 +5,76 @@
 #include "graphics.h"
 #include "game.h"
 
+#include <stddef.h>
+#include <assert.h>
+
 static t_texture textures[TOTAL_TEXTURES] = {};
 
-t_texture* get_texture(enum TEXTURE_ID id)
+t_texture* get_texture(t_texture_id id)
 {
+	assert(id >= 0 && id < TOTAL_TEXTURES);
     return &textures[id];
 }
 
-char *texture_paths[] = {
-	// floors
-	"assets/tiles/floor/floor_5.xpm",
-
-	// walls
-	"assets/tiles/wall/wall_1.xpm",
-	"assets/tiles/wall/wall_top_1.xpm",
-	"assets/tiles/wall/wall_top_right.xpm",
-	"assets/tiles/wall/wall_top_left.xpm",
-	"assets/tiles/wall/wall_top_inner_right_2.xpm",
-	"assets/tiles/wall/wall_top_inner_left_2.xpm",
-
-	// heroes
-	"assets/heroes/knight/knight_run_spritesheet.xpm",
-	"assets/heroes/knight/knight_idle_spritesheet.xpm",
-	"assets/digits.xpm",
-	"assets/battle_city.xpm"
+static char *texture_filenames[TOTAL_TEXTURES] = {
+	[TANK_YELLOW_TXR_ID] = "tank_yellow_spritesheet.xpm",
+	[TANK_GREEN_TXR_ID] = "tank_green_spritesheet.xpm",
+	[TANK_RED_TXR_ID] = "tank_red_spritesheet.xpm",
+	[TANK_WHITE_TXR_ID] = "tank_white_spritesheet.xpm",
+	[BULLET_TXR_ID] = "bullet_spritesheet.xpm",
+	[TERRAIN_TXR_ID] = "terrain_spritesheet.xpm",
+	[RESPAWN_TXR_ID] = "respawn_spritesheet.xpm",
+	[EFFECTS_TXR_ID] = "effects_spritesheet.xpm",
+	[BONUSES_TXR_ID] = "bonuses_spritesheet.xpm",
+	[OREL_TXR_ID] = "orel_spritesheet.xpm",
+	[DIRT_TXR_ID] = "dirt.xpm",
+	[DIGITS_TXR_ID] = "digits_spritesheet.xpm"
 };
 
-const int MAX_SIZE_PATH = 256;
-
-
-void load_textures(t_game* game)
+void set_texture_filename(char* filename, t_texture_id id)
 {
-	char buffer[MAX_SIZE_PATH] = {0};
-	int i = -1;
-	while (++i < TOTAL_TEXTURES)
-	{
-		ft_memset(buffer, 0, MAX_SIZE_PATH);
-		ft_strlcat(buffer, "/Users/dmiitry/program/solong/", MAX_SIZE_PATH);
-		ft_strlcat(buffer, texture_paths[i], MAX_SIZE_PATH);
-		
-		char *filename = buffer;
+	assert(id >= 0 && id < TOTAL_TEXTURES);
+	texture_filenames[id] = filename;
+}
 
+static const int MAX_SIZE_PATH = 256;
+static char* path_to_textures = "/Users/dmiitry/program/solong/assets/";
+
+int load_textures(t_graphics* ctx)
+{
+	char filename[MAX_SIZE_PATH] = {0};
+	int txr_id = 0;
+	while (txr_id < TOTAL_TEXTURES)
+	{
+		ft_memset(filename, 0, MAX_SIZE_PATH);
+		ft_strlcat(filename, path_to_textures, MAX_SIZE_PATH);
+		ft_strlcat(filename, texture_filenames[txr_id], MAX_SIZE_PATH);
+		
 		t_texture texture = {};
 		
 		if (ft_strcmp(".xpm", ft_strrchr(filename, '.')) == 0) {
-			texture.image = mlx_xpm_file_to_image(game->graphics->mlx, filename, &texture.width, &texture.height);
+			texture.image = mlx_xpm_file_to_image(ctx->mlx, filename, &texture.width, &texture.height);
 		}
-		else if (ft_strcmp(".png", ft_strrchr(filename, '.')) == 0) {
-			//texture.image = mlx_png_file_to_image(game->graphics->mlx, filename, &texture.width, &texture.height);
-		}
+		
 		if (texture.image == NULL) {
 			ft_printf("Could not load texture: %s\n", filename);
-			continue;
+			goto error;
 		}
 
-		int line_length = 0;
-		int endian = 0;
-
-		texture.addr = mlx_get_data_addr(texture.image, &texture.bits_per_pixel, &line_length, &endian);
-        texture.bits_per_pixel /= 8;
-		textures[i] = texture;
+		texture.addr = mlx_get_data_addr(texture.image, &texture.bits_per_pixel, &texture.line_len, &texture.endian);
+        texture.bits_per_pixel /= 8; // bytes
+		
+		textures[txr_id] = texture;
+		txr_id++;
 	}
+
+	return 0;
+
+error:
+	for (int i = 0; i < TOTAL_TEXTURES; i++) {
+		if (textures[i].image) {
+			mlx_destroy_image(ctx->mlx, textures[i].image);
+		}
+	}
+	return 1;
 }

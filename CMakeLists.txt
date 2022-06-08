@@ -5,7 +5,7 @@ add_executable(solong
     main.c
     keys.c
     graphics.c
-    loader.c
+    settings.c
     tank.c
     texture.c
     utils.c

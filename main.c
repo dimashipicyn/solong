@@ -6,6 +6,7 @@
 #include "vector.h"
 #include "framerate.h"
 #include "game_map.h"
+#include "settings.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -28,7 +29,7 @@ int loop_callback(void* data)
 
     while (game->lag > 5) {
         ft_list_foreach(entities, game_object_update);
-        update_physic_world(game->ph_world);
+        step_physic_world();
         game->lag -= 5;
     }
 
@@ -61,46 +62,36 @@ void loop(t_game* game)
 
 t_game* init_game()
 {
-    t_game* game = calloc(1, sizeof(t_game));
+    t_game* game = NULL;
+    t_graphics* graphics = NULL;
+    t_game_map* map = NULL;
+
+    game = calloc(1, sizeof(t_game));
     if (!game) {
+        ft_printf("Could not initialize game. Bad alloc.\n");
         return NULL;
     }
 
-    load_config(game);
-
-    struct pair {
-        char* key;
-        char* val;
-    };
-
-    struct pair* w = map_find(game->settings, "resolution_width");
-    struct pair* h = map_find(game->settings, "resolution_heigth");
-    size_t width = 0;
-    size_t heigth = 0;
-    
-    if (w && h) {
-        width = ft_atoi(w->val);
-        heigth = ft_atoi(h->val);
+    if (load_settings("../settings.yml")) {
+        goto error;
     }
     
-    if (width == 0 || width > 1920 || heigth == 0 || heigth > 1080) {
-        width = 800;
-        heigth = 600;
-    }
-    
-    t_graphics* graphics = init_graphics(width, heigth, "so_long");
+    t_settings* s = get_settings();
+    graphics = init_graphics(s->resolution_w, s->resolution_h, s->game_name);
     if (!graphics) {
-        free(game);
-        return NULL;
+        ft_printf("Could not initialize graphics.\n");
+        goto error;
     }
-    game->graphics = graphics;
 
-    load_textures(game);
+    if (load_textures(graphics)) {
+        ft_printf("Loading textures failed.\n");
+        goto error;
+    }
     
-    game->map = new_game_map("map.ber");
-    if (!game->map) {
+    map = new_game_map("../map.ber");
+    if (!map) {
         ft_printf("Could not load map!\n");
-        exit(1);
+        goto error;
     }
 
     t_physic_body_def def = {
@@ -113,7 +104,16 @@ t_game* init_game()
 
     ft_list_push_back(&entities, new_player(tank_body));
 
+    game->graphics = graphics;
+    game->map = map;
     return game;
+
+error:
+    free(game);
+    free(graphics);
+    free(map);
+
+    return NULL;
 }
 
 int main(int ac, char** argv) {

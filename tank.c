@@ -11,7 +11,7 @@ static void fire(t_tank* tank)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
     if (diff_time >= 1000 * 1) {
-        t_vec2 bullet_pos = vec2(tank->body->body.a.x + 10, tank->body->body.a.y + 10);
+        t_vec2 bullet_pos = vec2(tank->body->body.a.x + 12, tank->body->body.a.y + 12);
         t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 17));
         ft_list_push_back(&entities, new_bullet(pos, tank->body->dir, 1, tank));
 
@@ -87,7 +87,7 @@ void init_player(t_tank* player, t_physic_body* body)
     player->interface = &interface;
     player->body = body;
 
-    t_texture* texture = get_texture(TANK);
+    t_texture* texture = get_texture(TANK_RED_TXR_ID);
 
     t_vec2 pos = body->body.a;
 

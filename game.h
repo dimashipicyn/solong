@@ -16,8 +16,6 @@ typedef struct s_physic_world t_physic_world;
 
 typedef struct s_game {
     t_graphics  *graphics;
-	t_map		*settings;
-	t_physic_world* ph_world;
 	t_game_map	*map;
     t_keys      keys;
 	int64_t		lag;
