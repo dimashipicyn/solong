@@ -60,7 +60,19 @@ void loop(t_game* game)
     mlx_loop(game->graphics->mlx);
 }
 
-t_game* init_game()
+char* get_current_dir(char** env)
+{
+    while (*env)
+    {
+        if (ft_strncmp(*env, "PWD", 3) == 0) {
+            char* s = ft_strchr(*env, '=');
+            return ++s;
+        }
+        env++;
+    }
+}
+
+t_game* init_game(char** env)
 {
     t_game* game = NULL;
     t_graphics* graphics = NULL;
@@ -71,8 +83,13 @@ t_game* init_game()
         ft_printf("Could not initialize game. Bad alloc.\n");
         return NULL;
     }
-
-    if (load_settings("../settings.yml")) {
+    
+    char* path_to_cur_dir = get_current_dir(env);
+    
+    char buf[256];
+    ft_strlcpy(buf, path_to_cur_dir, 256);
+    ft_strlcat(buf, "/settings.yml", 256);
+    if (load_settings(buf)) {
         goto error;
     }
     
@@ -83,12 +100,15 @@ t_game* init_game()
         goto error;
     }
 
-    if (load_textures(graphics)) {
+    if (load_textures(graphics, path_to_cur_dir)) {
         ft_printf("Loading textures failed.\n");
         goto error;
     }
     
-    map = new_game_map("../map.ber");
+    ft_memset(buf, 0, 256);
+    ft_strlcpy(buf, path_to_cur_dir, 256);
+    ft_strlcat(buf, "/map.ber", 256);
+    map = new_game_map(buf);
     if (!map) {
         ft_printf("Could not load map!\n");
         goto error;
@@ -116,8 +136,8 @@ error:
     return NULL;
 }
 
-int main(int ac, char** argv) {
-    t_game* game = init_game();
+int main(int ac, char** argv, char** env) {
+    t_game* game = init_game(env);
     if (!game) {
         ft_printf("Could not init game!\n");
         return 1;
@@ -127,22 +147,3 @@ int main(int ac, char** argv) {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
