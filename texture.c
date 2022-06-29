@@ -17,18 +17,18 @@ t_texture* get_texture(t_texture_id id)
 }
 
 static char *texture_filenames[TOTAL_TEXTURES] = {
-	[TANK_YELLOW_TXR_ID] = "tank_yellow_spritesheet.xpm",
-	[TANK_GREEN_TXR_ID] = "tank_green_spritesheet.xpm",
-	[TANK_RED_TXR_ID] = "tank_red_spritesheet.xpm",
-	[TANK_WHITE_TXR_ID] = "tank_white_spritesheet.xpm",
-	[BULLET_TXR_ID] = "bullet_spritesheet.xpm",
-	[TERRAIN_TXR_ID] = "terrain_spritesheet.xpm",
-	[RESPAWN_TXR_ID] = "respawn_spritesheet.xpm",
-	[EFFECTS_TXR_ID] = "effects_spritesheet.xpm",
-	[BONUSES_TXR_ID] = "bonuses_spritesheet.xpm",
-	[OREL_TXR_ID] = "orel_spritesheet.xpm",
-	[DIRT_TXR_ID] = "dirt.xpm",
-	[DIGITS_TXR_ID] = "digits_spritesheet.xpm"
+	[TANK_YELLOW_TXR_ID] = "/assets/tank_yellow_spritesheet.xpm",
+	[TANK_GREEN_TXR_ID] = "/assets/tank_green_spritesheet.xpm",
+	[TANK_RED_TXR_ID] = "/assets/tank_red_spritesheet.xpm",
+	[TANK_WHITE_TXR_ID] = "/assets/tank_white_spritesheet.xpm",
+	[BULLET_TXR_ID] = "/assets/bullet_spritesheet.xpm",
+	[TERRAIN_TXR_ID] = "/assets/terrain_spritesheet.xpm",
+	[RESPAWN_TXR_ID] = "/assets/respawn_spritesheet.xpm",
+	[EFFECTS_TXR_ID] = "/assets/effects_spritesheet.xpm",
+	[BONUSES_TXR_ID] = "/assets/bonuses_spritesheet.xpm",
+	[OREL_TXR_ID] = "/assets/orel_spritesheet.xpm",
+	[DIRT_TXR_ID] = "/assets/dirt.xpm",
+	[DIGITS_TXR_ID] = "/assets/digits_spritesheet.xpm"
 };
 
 void set_texture_filename(char* filename, t_texture_id id)
@@ -38,16 +38,15 @@ void set_texture_filename(char* filename, t_texture_id id)
 }
 
 static const int MAX_SIZE_PATH = 256;
-static char* path_to_textures = "/Users/dmiitry/program/solong/assets/";
 
-int load_textures(t_graphics* ctx)
+int load_textures(t_graphics* ctx, char* path_to_cur_dir)
 {
 	char filename[MAX_SIZE_PATH] = {0};
 	int txr_id = 0;
 	while (txr_id < TOTAL_TEXTURES)
 	{
 		ft_memset(filename, 0, MAX_SIZE_PATH);
-		ft_strlcat(filename, path_to_textures, MAX_SIZE_PATH);
+		ft_strlcat(filename, path_to_cur_dir, MAX_SIZE_PATH);
 		ft_strlcat(filename, texture_filenames[txr_id], MAX_SIZE_PATH);
 		
 		t_texture texture = {};

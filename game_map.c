@@ -70,7 +70,7 @@ static int load_map(t_game_map* map, char* filename)
 {
 	int fd;
 
-	fd = open("../map.ber", O_RDONLY);
+	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 	{
 		ft_printf("Dont open map!\n");
