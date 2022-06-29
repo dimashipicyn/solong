@@ -70,6 +70,7 @@ void update_player(t_tank* player)
 void render_player(t_tank* player, t_graphics* graphics, int32_t elapsed)
 {
     update_animation(&player->anim, elapsed);
+
     t_sprite s = player->anim.sprite;
     s.dest.x = player->body->body.a.x - 2;
     s.dest.y = player->body->body.a.y - 2;
@@ -98,7 +99,8 @@ void init_player(t_tank* player, t_physic_body* body)
             .dest = (t_rect){pos.x,pos.y,32,32},
             .src = (t_rect){0,0,16,16},
             .texture = texture
-        }
+        },
+        .repeat = 1
     };
 }
 

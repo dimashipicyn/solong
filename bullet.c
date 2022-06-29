@@ -17,6 +17,12 @@ static int cmp(void* t, void* p)
     return 1;
 }
 
+typedef enum s_state {
+    RUN,
+    EXPLOSION,
+    END
+} t_state;
+
 static void input(t_bullet* bullet, t_keys keys)
 {
     
@@ -27,31 +33,47 @@ static void update(t_bullet* bullet)
     t_vec2 dir = bullet->body->dir;
     t_vec2 pos = bullet->body->body.a;
 
-    if (dir.y == -1) {
-        bullet->sprite.src.x = 0;
-    }
-    if (dir.y == 1) {
-        bullet->sprite.src.x = 8;
-    }
-    if (dir.x == -1) {
-        bullet->sprite.src.x = 4;
-    }
-    if (dir.x == 1) {
-        bullet->sprite.src.x = 12;
-    }
+    switch (bullet->state) {
+        case RUN: {
+            char contact = bullet->body->contact;
 
-    char contact = bullet->body->contact;
-
-    if (contact || pos.x < -32 || pos.x > 1000 || pos.y < -32 || pos.y > 1000) {
-        set_empty_terrain(bullet->body->contacted_body->user_data);
-        free_bullet(bullet);
-        ft_list_remove_if(&entities, bullet, cmp);
+            if (contact)
+            {
+                t_sprite sprite = {
+                    .texture = get_texture(EFFECTS_TXR_ID),
+                    .src = {0,0,16,16},
+                    .dest = {0,0,16,16}
+                };
+                bullet->anim = (t_animation) {
+                    .duration = 300,
+                    .nframes = 2,
+                    .sprite = sprite,
+                    .repeat = 1
+                };
+                bullet->state = EXPLOSION;
+            }
+            break;
+        }
+        case EXPLOSION: {
+            if (bullet->anim.is_end) {
+                bullet->state = END;
+            }
+            break;   
+        }
+        case END: {
+            set_empty_terrain(bullet->body->contacted_body->user_data);
+            free_bullet(bullet);
+            ft_list_remove_if(&entities, bullet, cmp);
+            break;
+        }
     }
 }
 
 static void draw(t_bullet* bullet, t_graphics* graphics, int32_t elapsed)
 {
-    t_sprite s = bullet->sprite;
+    update_animation(&bullet->anim, elapsed);
+
+    t_sprite s = bullet->anim.sprite;
     s.dest.x = bullet->body->body.a.x;
     s.dest.y = bullet->body->body.a.y;
 
@@ -82,9 +104,34 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
     bullet->owner = owner;
     bullet->body = body;
 
-    bullet->sprite.texture = get_texture(BULLET_TXR_ID);
-    bullet->sprite.dest = (t_rect){pos.x, pos.y, 6, 6};
-    bullet->sprite.src = (t_rect){0, 0, 4, 4};
+    t_sprite sprite;
+    sprite.texture = get_texture(BULLET_TXR_ID);
+    sprite.dest = (t_rect){pos.x, pos.y, 6, 6};
+    sprite.src = (t_rect){0, 0, 4, 4};
+    
+    if (dir.y == -1)
+    {
+        sprite.src.x = 0;
+    }
+    if (dir.y == 1)
+    {
+        sprite.src.x = 8;
+    }
+    if (dir.x == -1)
+    {
+        sprite.src.x = 4;
+    }
+    if (dir.x == 1)
+    {
+        sprite.src.x = 12;
+    }
+
+    bullet->anim = (t_animation) {
+        .duration = 1,
+        .nframes = 1,
+        .sprite = sprite,
+        .repeat = 1
+    };
 
     return bullet;
 }

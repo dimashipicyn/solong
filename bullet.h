@@ -11,8 +11,9 @@ typedef struct s_tank t_tank;
 typedef struct bullet {
     t_game_object*  interface;
     t_physic_body*  body;
-    t_sprite        sprite;
     t_tank*         owner;
+    t_animation     anim;
+    int             state;
 } t_bullet;
 
 t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner);

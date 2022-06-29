@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
 
 typedef enum {
     EMPTY,
@@ -139,7 +140,7 @@ static int load_map(t_game_map* map, char* filename)
     return 0;
 }
 
-void draw_game_map(t_game_map* game_map, t_graphics* graphics)
+void draw_game_map(t_game_map* game_map, t_graphics* graphics, t_vec2 pos)
 {
     size_t row;
     size_t col;

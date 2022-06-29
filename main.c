@@ -12,7 +12,7 @@
 #include <time.h>
 
 t_list *entities = NULL;
-
+t_tank* tank = NULL;
 int loop_callback(void* data)
 {
     t_game* game = (t_game*)data;
@@ -33,7 +33,7 @@ int loop_callback(void* data)
         game->lag -= 5;
     }
 
-    draw_game_map(game->map, game->graphics);
+    draw_game_map(game->map, game->graphics, tank->body->body.a);
     
     for (t_list* it = entities; it != NULL; it = it->next) {
         game_object_render(it->content, game->graphics, elapsed);
@@ -101,8 +101,8 @@ t_game* init_game()
         .is_dynamic = 1
     };
     t_physic_body* tank_body = create_physic_body(def);
-
-    ft_list_push_back(&entities, new_player(tank_body));
+    tank = new_player(tank_body);
+    ft_list_push_back(&entities, tank);
 
     game->graphics = graphics;
     game->map = map;

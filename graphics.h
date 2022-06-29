@@ -49,6 +49,8 @@ typedef struct s_animation
     int32_t nframes;
     int32_t duration;
     int32_t elapsed;
+    char    repeat;
+    char    is_end;
 } t_animation;
 
 typedef struct s_game t_game;

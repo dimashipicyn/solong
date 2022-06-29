@@ -86,9 +86,15 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 
 void update_animation(t_animation* animation, int32_t elapsed_time)
 {
-    int32_t index = animation->nframes * animation->elapsed / animation->duration;
+    int32_t index = animation->nframes * animation->elapsed / animation->duration % animation->nframes;
+    //index = animation->repeat ? index % animation->nframes : fmin(index, animation->nframes - 1);
+
     animation->sprite.src.x = index * animation->sprite.src.width + animation->sprite.src.x;
     animation->elapsed += elapsed_time;
+
+    if (animation->elapsed >= animation->duration) {
+        animation->is_end = 1;
+    }
     animation->elapsed %= animation->duration;
 }
 
