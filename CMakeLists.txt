@@ -5,13 +5,16 @@ add_executable(solong
     main.c
     keys.c
     graphics.c
-    loader.c
-    player.c
+    settings.c
+    tank.c
     texture.c
     utils.c
     game_object.c
     framerate.c
     game_map.c
+    bullet.c
+    physics.c
+    vector.c
 )
 
 #MLX
