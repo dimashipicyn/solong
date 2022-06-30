@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(solong VERSION 0.1.0)
 
-add_executable(solong
+set(SOURCE_FILES 
     main.c
     keys.c
     graphics.c
@@ -15,6 +15,28 @@ add_executable(solong
     bullet.c
     physics.c
     vector.c
+    animation.c
+)
+
+set(HEADER_FILES 
+    keys.h
+    graphics.h
+    settings.h
+    tank.h
+    texture.h
+    utils.h
+    game_object.h
+    framerate.h
+    game_map.h
+    bullet.h
+    physics.h
+    vector.h
+    animation.h
+)
+
+add_executable(solong 
+    ${SOURCE_FILES}
+    ${HEADER_FILES}
 )
 
 #MLX

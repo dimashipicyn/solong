@@ -41,15 +41,10 @@ static void update(t_bullet* bullet)
             {
                 t_sprite sprite = {
                     .texture = get_texture(EFFECTS_TXR_ID),
-                    .src = {0,0,16,16},
-                    .dest = {0,0,16,16}
+                    .src = {32,0,16,16},
+                    .dest = {0,0,32,32}
                 };
-                bullet->anim = (t_animation) {
-                    .duration = 300,
-                    .nframes = 2,
-                    .sprite = sprite,
-                    .repeat = 1
-                };
+                bullet->anim = animation(sprite, 3, 300, 0);
                 bullet->state = EXPLOSION;
             }
             break;
@@ -57,11 +52,12 @@ static void update(t_bullet* bullet)
         case EXPLOSION: {
             if (bullet->anim.is_end) {
                 bullet->state = END;
+                bullet->anim.nframes = 0;
             }
             break;   
         }
         case END: {
-            set_empty_terrain(bullet->body->contacted_body->user_data);
+            destroy_terrain(bullet->body->contacted_body->user_data);
             free_bullet(bullet);
             ft_list_remove_if(&entities, bullet, cmp);
             break;
@@ -73,9 +69,9 @@ static void draw(t_bullet* bullet, t_graphics* graphics, int32_t elapsed)
 {
     update_animation(&bullet->anim, elapsed);
 
-    t_sprite s = bullet->anim.sprite;
-    s.dest.x = bullet->body->body.a.x;
-    s.dest.y = bullet->body->body.a.y;
+    t_sprite s = get_animation_sprite(&bullet->anim);
+    s.dest.x = bullet->body->body.a.x - s.dest.width / 2;
+    s.dest.y = bullet->body->body.a.y - s.dest.height / 2;
 
     draw_sprite_to_frame(graphics, s);
 }

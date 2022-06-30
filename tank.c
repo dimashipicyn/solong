@@ -10,7 +10,7 @@ extern t_list *entities;
 static void fire(t_tank* tank)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
-    if (diff_time >= 1000 * 1) {
+    if (diff_time >= 500 * 1) {
         t_vec2 bullet_pos = vec2(tank->body->body.a.x + 12, tank->body->body.a.y + 12);
         t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 17));
         ft_list_push_back(&entities, new_bullet(pos, tank->body->dir, 1, tank));
@@ -71,7 +71,7 @@ void render_player(t_tank* player, t_graphics* graphics, int32_t elapsed)
 {
     update_animation(&player->anim, elapsed);
 
-    t_sprite s = player->anim.sprite;
+    t_sprite s = get_animation_sprite(&player->anim);
     s.dest.x = player->body->body.a.x - 2;
     s.dest.y = player->body->body.a.y - 2;
     draw_sprite_to_frame(graphics, s);
@@ -91,17 +91,13 @@ void init_player(t_tank* player, t_physic_body* body)
     t_texture* texture = get_texture(TANK_RED_TXR_ID);
 
     t_vec2 pos = body->body.a;
-
-    player->anim = (t_animation){
-        .duration = 200,
-        .nframes = 1,
-        .sprite = (t_sprite){
-            .dest = (t_rect){pos.x,pos.y,32,32},
-            .src = (t_rect){0,0,16,16},
-            .texture = texture
-        },
-        .repeat = 1
+    
+    t_sprite sprite = (t_sprite){
+        .dest = (t_rect){pos.x,pos.y,32,32},
+        .src = (t_rect){0,0,16,16},
+        .texture = texture
     };
+    player->anim = animation(sprite, 1, 200, 1);
 }
 
 t_tank* new_player(t_physic_body* body)

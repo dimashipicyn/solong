@@ -75,27 +75,13 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
             int color = get_pixel_texture(sprite.texture, sprite.src.x + x * scale_x, sprite.src.y + y * scale_y);
 
             // черный цвет пропускаем
-            if (color == 0x00FFFFFF || color == 0x00000001) {
+            if (/* color == 0x00FFFFFF || */ color == 0x00000001) {
                 continue;
             }
             
             set_pixel_texture(frame, x + sprite.dest.x, y + sprite.dest.y, color);
         }
     }
-}
-
-void update_animation(t_animation* animation, int32_t elapsed_time)
-{
-    int32_t index = animation->nframes * animation->elapsed / animation->duration % animation->nframes;
-    //index = animation->repeat ? index % animation->nframes : fmin(index, animation->nframes - 1);
-
-    animation->sprite.src.x = index * animation->sprite.src.width + animation->sprite.src.x;
-    animation->elapsed += elapsed_time;
-
-    if (animation->elapsed >= animation->duration) {
-        animation->is_end = 1;
-    }
-    animation->elapsed %= animation->duration;
 }
 
 void clear(t_graphics* graphics)

@@ -43,22 +43,11 @@ typedef struct s_sprite {
     t_rect      src; 
 } t_sprite;
 
-typedef struct s_animation
-{
-    t_sprite sprite;
-    int32_t nframes;
-    int32_t duration;
-    int32_t elapsed;
-    char    repeat;
-    char    is_end;
-} t_animation;
-
 typedef struct s_game t_game;
 
 t_graphics*	init_graphics(int width, int height, char* title);
 void		draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite);
 void		render_frame(t_graphics* graphics);
-void        update_animation(t_animation* animation, int32_t elapsed_time);
 void        draw_line_to_frame(t_graphics* grapics, t_line line);
 void        draw_rect_to_frame(t_graphics* grapics, t_rect rect);
 void        draw_circle_to_frame(t_graphics* grapics, t_circle circle);

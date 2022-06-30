@@ -5,6 +5,7 @@
 #include "game_object.h"
 #include "graphics.h"
 #include "physics.h"
+#include "animation.h"
 
 typedef struct s_tank t_tank;
 

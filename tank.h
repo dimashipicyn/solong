@@ -8,6 +8,7 @@
 #include "texture.h"
 #include "graphics.h"
 #include "physics.h"
+#include "animation.h"
 
 typedef struct s_tank
 {

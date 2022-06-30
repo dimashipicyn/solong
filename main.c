@@ -39,7 +39,7 @@ int loop_callback(void* data)
         game_object_render(it->content, game->graphics, elapsed);
     }
     
-    draw_framerate(game->graphics, elapsed);
+    //draw_framerate(game->graphics, elapsed);
 
     render_frame(graphics);
 
@@ -115,9 +115,9 @@ t_game* init_game(char** env)
     }
 
     t_physic_body_def def = {
-        .pos = vec2(100,100),
+        .pos = get_start_player_pos(map),
         .size = vec2(28,28),
-        .dir = vec2(0, 1),
+        .dir = vec2(0, -1),
         .is_dynamic = 1
     };
     t_physic_body* tank_body = create_physic_body(def);

@@ -11,12 +11,14 @@
 #include <math.h>
 
 typedef enum {
-    EMPTY,
-    BRICK,
-    CONCRETE,
-    WATER,
-    FOREST,
-    ICE,
+    EMPTY       = '0' - '0',
+    BRICK       = '1' - '0',
+    CONCRETE    = '2' - '0',
+    WATER       = '3' - '0',
+    FOREST      = '4' - '0',
+    ICE         = '5' - '0',
+    PLAYER_1    = 'P' - '0',
+    BASE_OREL   = 'B' - '0',
     TILE_TYPE_SIZE
 } t_tile_type;
 
@@ -33,13 +35,16 @@ typedef struct s_game_map
 	t_terrain*  tiles;
 	int32_t     width;
 	int32_t     height;
+    t_vec2      start_player_pos;
 } t_game_map;
 
-void set_empty_terrain(t_terrain* terrain)
+void destroy_terrain(t_terrain* terrain)
 {
-    free_physic_body(terrain->body);
-    terrain->body = NULL;
-    terrain->type = EMPTY;
+    if (terrain->type == BRICK) {
+        free_physic_body(terrain->body);
+        terrain->body = NULL;
+        terrain->type = EMPTY;
+    }
 }
 
 static int load_map(t_game_map* map, char* filename);
@@ -58,6 +63,7 @@ t_game_map* new_game_map(char* filename)
     sprites[FOREST] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {16,0,8,8}};
     sprites[ICE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
     sprites[WATER] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
+    sprites[BASE_OREL] = (t_sprite){get_texture(OREL_TXR_ID), {0,0,32,32}, {0,0,16,16}};
     return map;
 }
 
@@ -115,13 +121,21 @@ static int load_map(t_game_map* map, char* filename)
                 .type = type,
                 .body = NULL
             };
-            if (type == BRICK) {
+            
+            if (type == BRICK || type == WATER || type == CONCRETE)
+            {
                 t_physic_body_def def = {
                     .pos = vec2(x * 16, y * 16),
                     .size = vec2(16,16),
                     .user_data = it_tiles
                 };
                 it_tiles->body = create_physic_body(def);
+            }
+            
+            if (type == PLAYER_1)
+            {
+                map->start_player_pos = vec2(x * 16, y * 16);
+                it_tiles->type = EMPTY;
             }
             
             ++row;
@@ -145,6 +159,8 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics, t_vec2 pos)
     size_t row;
     size_t col;
     t_terrain* tiles;
+    
+    t_sprite orel = {};
 
     row = 0;
     tiles = game_map->tiles;
@@ -154,12 +170,29 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics, t_vec2 pos)
         while (col < game_map->width)
         {
             t_terrain terrain = tiles[row * game_map->width + col];
+            
+            t_sprite sprite_empty = sprites[EMPTY];
+            sprite_empty.dest.x = col * sprite_empty.dest.width;
+            sprite_empty.dest.y = row * sprite_empty.dest.height;
+            draw_sprite_to_frame(graphics, sprite_empty);
+            
             t_sprite sprite = sprites[terrain.type];
-            sprite.dest.x = col * sprite.dest.width;
-            sprite.dest.y = row * sprite.dest.height;
+            sprite.dest.x = col * 16;
+            sprite.dest.y = row * 16;
+            
+            if (terrain.type == BASE_OREL) {
+                orel = sprite;
+            }
+            
             draw_sprite_to_frame(graphics, sprite);
             col++;
         }
         row++;
     }
+    draw_sprite_to_frame(graphics, orel);
+}
+
+t_vec2 get_start_player_pos(t_game_map* map)
+{
+    return map->start_player_pos;
 }
