@@ -42,39 +42,48 @@ void input_player(t_tank* player, t_keys keys)
     if (keys.left) {
         fire(player);
     }
+    
+    if ((get_time() - player->birth_date) >= 3000)
+    {
+        player->animations = 1;
+    }
 }
 
 void update_player(t_tank* player)
 {
     if (player->body->dir.y == -1) {
-        player->anim.sprite.src.x = 0;
+        player->anim[0].sprite.src.x = 0;
     }
     if (player->body->dir.y == 1) {
-        player->anim.sprite.src.x = 64;
+        player->anim[0].sprite.src.x = 64;
     }
     if (player->body->dir.x == -1) {
-        player->anim.sprite.src.x = 32;
+        player->anim[0].sprite.src.x = 32;
     }
     if (player->body->dir.x == 1) {
-        player->anim.sprite.src.x = 96;
+        player->anim[0].sprite.src.x = 96;
     }
 
     if (player->body->velocity > 0.1) {
-        player->anim.nframes = 2;
+        player->anim[0].nframes = 2;
     }
     else {
-        player->anim.nframes = 1;
+        player->anim[0].nframes = 1;
     }
 }
 
 void render_player(t_tank* player, t_graphics* graphics, int32_t elapsed)
 {
-    update_animation(&player->anim, elapsed);
+    update_animation(&player->anim[0], elapsed);
+    update_animation(&player->anim[1], elapsed);
 
-    t_sprite s = get_animation_sprite(&player->anim);
-    s.dest.x = player->body->body.a.x - 2;
-    s.dest.y = player->body->body.a.y - 2;
-    draw_sprite_to_frame(graphics, s);
+    for (int i = 0; i < player->animations; i++) {
+        t_sprite s = get_animation_sprite(&player->anim[i]);
+        s.dest.x = player->body->body.a.x - 2;
+        s.dest.y = player->body->body.a.y - 2;
+        
+        draw_sprite_to_frame(graphics, s);
+    }
 }
 
 static t_game_object interface = {
@@ -88,16 +97,25 @@ void init_player(t_tank* player, t_physic_body* body)
     player->interface = &interface;
     player->body = body;
 
-    t_texture* texture = get_texture(TANK_RED_TXR_ID);
-
     t_vec2 pos = body->body.a;
     
-    t_sprite sprite = (t_sprite){
+    t_sprite tank = (t_sprite){
         .dest = (t_rect){pos.x,pos.y,32,32},
         .src = (t_rect){0,0,16,16},
-        .texture = texture
+        .texture = get_texture(TANK_RED_TXR_ID)
     };
-    player->anim = animation(sprite, 1, 200, 1);
+    
+    t_sprite armor = (t_sprite){
+        .dest = (t_rect){pos.x,pos.y,32,32},
+        .src = (t_rect){0,0,16,16},
+        .texture = get_texture(EFFECTS_TXR_ID)
+    };
+    
+    player->anim[TANK_ANIMATION] = animation(tank, 1, 200, 1);
+    player->anim[ARMOR_ANIMATION] = animation(armor, 2, 50, 1);
+    player->animations = 2;
+    
+    player->birth_date = get_time();
 }
 
 t_tank* new_player(t_physic_body* body)
@@ -109,6 +127,6 @@ t_tank* new_player(t_physic_body* body)
 
 void delete_player(t_tank* player)
 {
-    free(player->body);
+    free_physic_body(player->body);
     free(player);
 }
