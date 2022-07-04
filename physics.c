@@ -54,27 +54,30 @@ void step_physic_world()
 
     for (t_list* it1 = w->dynamic_bodies; it1 != NULL; it1 = it1->next)
     {
-        t_physic_body* body = it1->content;
-        t_body_rect rect = body->body;
-        if (body->velocity == 0) {
+        t_physic_body* body_1 = it1->content;
+        t_body_rect move_rect = body_1->body;
+        
+        if (body_1->velocity == 0) {
             continue;
         }
 
-        rect.a = vec2_add(body->body.a, vec2_scalar_num(body->dir, body->velocity));
+        body_1->contact = 0;
+        body_1->contacted_body = NULL;
 
-        int is_detect_collision = 0;
-        for (t_list* it2 = w->static_bodies; it2 != NULL; it2 = it2->next) {
-            t_body_rect rect_1 = ((t_physic_body*)it2->content)->body;
-            if (intersect(rect, rect_1)) {
-                is_detect_collision = 1;
-                body->contact = 1;
-                body->contacted_body = it2->content;
+        move_rect.a = vec2_add(body_1->body.a, vec2_scalar_num(body_1->dir, body_1->velocity));
+
+        for (t_list* it2 = w->static_bodies; it2 != NULL; it2 = it2->next)
+        {
+            t_physic_body* body_2 = it2->content;
+            if (body_1->layer & body_2->layer && intersect(move_rect, body_2->body)) {
+                body_1->contact = 1;
+                body_1->contacted_body = body_2;
                 break;
             }
         }
 
-        if (!is_detect_collision) {
-            body->body = rect;
+        if (!body_1->contact) {
+            body_1->body = move_rect;
         }
     }
 }
@@ -89,6 +92,7 @@ t_physic_body* create_physic_body(t_physic_body_def def)
     b->stop_on_contact = 1;
     b->contact = 0;
     b->user_data = def.user_data;
+    b->layer = def.layer;
 
     if (def.is_dynamic) {
         ft_list_push_back(&physic_world.dynamic_bodies, b);

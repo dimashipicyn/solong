@@ -118,7 +118,8 @@ t_game* init_game(char** env)
         .pos = get_start_player_pos(map),
         .size = vec2(28,28),
         .dir = vec2(0, -1),
-        .is_dynamic = 1
+        .is_dynamic = 1,
+        .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
     };
     t_physic_body* tank_body = create_physic_body(def);
     tank = new_player(tank_body);

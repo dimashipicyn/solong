@@ -13,3 +13,8 @@ void game_object_render(void *object, void *graphics, int32_t elapsed)
 { 
     (*(t_game_object**)object)->render(object, graphics, elapsed);
 }
+
+void game_object_damage(void *object, int32_t damage)
+{
+    (*(t_game_object**)object)->damage(object, damage);
+}

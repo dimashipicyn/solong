@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include "texture.h"
 #include "physics.h"
+#include "game_object.h"
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -22,13 +23,19 @@ typedef enum {
     TILE_TYPE_SIZE
 } t_tile_type;
 
+enum {
+    DEFAULT_ARMOR = 0,
+    BRICK_ARMOR = 100,
+    CONCRETE_ARMOR = 500
+};
+
 typedef struct s_terrain
 {
+    t_game_object*  interface;
     t_tile_type     type;
     t_physic_body*  body;
+    int32_t         armor;
 } t_terrain;
-
-static t_sprite sprites[TILE_TYPE_SIZE] = {};
 
 typedef struct s_game_map
 {
@@ -38,14 +45,21 @@ typedef struct s_game_map
     t_vec2      start_player_pos;
 } t_game_map;
 
-void destroy_terrain(t_terrain* terrain)
+void damage(t_terrain* terrain, int32_t damage)
 {
-    if (terrain->type == BRICK) {
+    terrain->armor -= damage;
+    if (terrain->armor <= 0) {
         free_physic_body(terrain->body);
         terrain->body = NULL;
         terrain->type = EMPTY;
     }
 }
+
+static t_game_object interface = {
+    .damage = damage
+};
+
+static t_sprite sprites[TILE_TYPE_SIZE] = {};
 
 static int load_map(t_game_map* map, char* filename);
 
@@ -57,6 +71,7 @@ t_game_map* new_game_map(char* filename)
         free(map);
         return NULL;
     }
+
     sprites[EMPTY] = (t_sprite){get_texture(DIRT_TXR_ID), {0,0,16,16}, {0,0,16,16}};
     sprites[BRICK] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {0,0,8,8}};
     sprites[CONCRETE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {8,0,8,8}};
@@ -64,6 +79,7 @@ t_game_map* new_game_map(char* filename)
     sprites[ICE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
     sprites[WATER] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
     sprites[BASE_OREL] = (t_sprite){get_texture(OREL_TXR_ID), {0,0,32,32}, {0,0,16,16}};
+    
     return map;
 }
 
@@ -71,6 +87,56 @@ void delete_game_map(t_game_map* game_map)
 {
     free(game_map->tiles);
     free(game_map);
+}
+
+int32_t get_physics_layer_from_type(t_tile_type type)
+{
+    switch (type)
+    {
+    case BRICK:
+    case CONCRETE:
+        return PHYSICS_LAYER_1;
+    case WATER:
+        return PHYSICS_LAYER_2;
+    
+    default:
+        break;
+    }
+    return PHYSICS_LAYER_EMPTY;
+}
+
+int32_t get_armor_from_type(t_tile_type type)
+{
+    switch (type)
+    {
+    case BRICK:
+        return BRICK_ARMOR;
+    case CONCRETE:
+        return CONCRETE_ARMOR;
+    default:
+        break;
+    }
+    return DEFAULT_ARMOR;
+}
+
+void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
+{
+    terrain->type = type;
+    terrain->body = NULL;
+    terrain->interface = &interface;
+    terrain->armor = get_armor_from_type(type);
+
+    if (type == BRICK || type == WATER || type == CONCRETE)
+    {
+        t_physic_body_def def = {
+            .pos = vec2(x * 16, y * 16),
+            .size = vec2(16, 16),
+            .user_data = terrain,
+            .layer = get_physics_layer_from_type(type)
+        };
+
+        terrain->body = create_physic_body(def);
+    }
 }
 
 static int load_map(t_game_map* map, char* filename)
@@ -116,28 +182,15 @@ static int load_map(t_game_map* map, char* filename)
         x = 0;
 		while (*row) {
             t_tile_type type = *row - '0';
-            
-            *it_tiles = (t_terrain){
-                .type = type,
-                .body = NULL
-            };
-            
-            if (type == BRICK || type == WATER || type == CONCRETE)
-            {
-                t_physic_body_def def = {
-                    .pos = vec2(x * 16, y * 16),
-                    .size = vec2(16,16),
-                    .user_data = it_tiles
-                };
-                it_tiles->body = create_physic_body(def);
-            }
-            
+
+            init_terrain(it_tiles, type, x, y);
+
             if (type == PLAYER_1)
             {
                 map->start_player_pos = vec2(x * 16, y * 16);
                 it_tiles->type = EMPTY;
             }
-            
+
             ++row;
             ++it_tiles;
             x++;

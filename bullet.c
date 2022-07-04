@@ -57,7 +57,8 @@ static void update(t_bullet* bullet)
             break;   
         }
         case END: {
-            destroy_terrain(bullet->body->contacted_body->user_data);
+            void* gm_obj = bullet->body->contacted_body->user_data;
+            game_object_damage(gm_obj, 100);
             free_bullet(bullet);
             ft_list_remove_if(&entities, bullet, cmp);
             break;
@@ -91,7 +92,8 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
         .size = vec2(4,4),
         .dir = dir,
         .velocity = velocity,
-        .is_dynamic = 1
+        .is_dynamic = 1,
+        .layer = PHYSICS_LAYER_1
     };
     t_physic_body* body = create_physic_body(def);
     body->stop_on_contact = 0;
