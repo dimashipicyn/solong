@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "game_object.h"
+#include "entity.h"
 #include "vector.h"
 #include "texture.h"
 #include "graphics.h"
@@ -18,7 +18,7 @@ enum {
 
 typedef struct s_tank
 {
-    t_game_object   *interface;
+    t_entity_methods *methods;
     t_physic_body   *body;
     t_animation     anim[TOTAL_ANIMATIONS];
     int64_t         last_fire_time;
@@ -26,7 +26,7 @@ typedef struct s_tank
     int32_t         animations;
 } t_tank;
 
-t_tank* new_player(t_physic_body* body);
-void delete_player(t_tank* tank);
+t_entity* new_tank(t_physic_body* body);
+void delete_tank(t_tank* tank);
 
 #endif

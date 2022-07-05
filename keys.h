@@ -11,9 +11,9 @@ typedef struct			s_keys
 	int					right_move;
 }						t_keys;
 
-typedef struct s_game t_game;
+typedef struct s_game_ctx t_game_ctx;
 
-int		key_init(int keycode, t_game* game);
-int		key_destroy(int keycode, t_game* game);
+int		key_init(int keycode, t_game_ctx* game);
+int		key_destroy(int keycode, t_game_ctx* game);
 
 #endif

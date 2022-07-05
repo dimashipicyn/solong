@@ -3,7 +3,7 @@
 #include "graphics.h"
 #include "texture.h"
 #include "physics.h"
-#include "game_object.h"
+#include "entity.h"
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -31,7 +31,7 @@ enum {
 
 typedef struct s_terrain
 {
-    t_game_object*  interface;
+    t_entity_methods*  methods;
     t_tile_type     type;
     t_physic_body*  body;
     int32_t         armor;
@@ -45,8 +45,10 @@ typedef struct s_game_map
     t_vec2      start_player_pos;
 } t_game_map;
 
-void damage(t_terrain* terrain, int32_t damage)
+void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 {
+    t_terrain* terrain = (t_terrain*)entity;
+    
     terrain->armor -= damage;
     if (terrain->armor <= 0) {
         free_physic_body(terrain->body);
@@ -55,7 +57,7 @@ void damage(t_terrain* terrain, int32_t damage)
     }
 }
 
-static t_game_object interface = {
+static t_entity_methods methods = {
     .damage = damage
 };
 
@@ -123,7 +125,7 @@ void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
 {
     terrain->type = type;
     terrain->body = NULL;
-    terrain->interface = &interface;
+    terrain->methods = &methods;
     terrain->armor = get_armor_from_type(type);
 
     if (type == BRICK || type == WATER || type == CONCRETE)
@@ -207,7 +209,7 @@ static int load_map(t_game_map* map, char* filename)
     return 0;
 }
 
-void draw_game_map(t_game_map* game_map, t_graphics* graphics, t_vec2 pos)
+void draw_game_map(t_game_map* game_map, t_graphics* graphics)
 {
     size_t row;
     size_t col;

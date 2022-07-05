@@ -4,18 +4,10 @@
 #include "tank.h"
 #include "libft.h"
 #include "game_map.h"
+#include "scene.h"
+#include "game.h"
 
 #include <stdlib.h>
-
-extern t_list* entities;
-
-static int cmp(void* t, void* p)
-{
-    if (t == p) {
-        return 0;
-    }
-    return 1;
-}
 
 typedef enum s_state {
     RUN,
@@ -23,13 +15,15 @@ typedef enum s_state {
     END
 } t_state;
 
-static void input(t_bullet* bullet, t_keys keys)
+static void input(t_entity* entity, t_game_ctx* game_ctx)
 {
     
 }
 
-static void update(t_bullet* bullet)
+static void update(t_entity* entity, t_game_ctx* game_ctx)
 {
+    t_bullet* bullet = (t_bullet*)entity;
+    
     t_vec2 dir = bullet->body->dir;
     t_vec2 pos = bullet->body->body.a;
 
@@ -57,33 +51,41 @@ static void update(t_bullet* bullet)
             break;   
         }
         case END: {
-            void* gm_obj = bullet->body->contacted_body->user_data;
-            game_object_damage(gm_obj, 100);
-            free_bullet(bullet);
-            ft_list_remove_if(&entities, bullet, cmp);
+            t_entity* contacted_entity = bullet->body->contacted_body->user_data;
+            entity_damage(contacted_entity, game_ctx, 100);
+            scene_remove_entity(game_ctx->active_scene, entity);
             break;
         }
     }
 }
 
-static void draw(t_bullet* bullet, t_graphics* graphics, int32_t elapsed)
+static void draw(t_entity* entity, t_game_ctx* game_ctx)
 {
-    update_animation(&bullet->anim, elapsed);
+    t_bullet* bullet = (t_bullet*)entity;
+    
+    update_animation(&bullet->anim, game_ctx->elapsed);
 
     t_sprite s = get_animation_sprite(&bullet->anim);
     s.dest.x = bullet->body->body.a.x - s.dest.width / 2;
     s.dest.y = bullet->body->body.a.y - s.dest.height / 2;
 
-    draw_sprite_to_frame(graphics, s);
+    draw_sprite_to_frame(game_ctx->graphics, s);
 }
 
-static t_game_object interface = {
+static void bullet_free(t_entity* entity)
+{
+    t_bullet* bullet = (t_bullet*)entity;
+    free_bullet(bullet);
+}
+
+static t_entity_methods methods = {
     .input = input,
     .update = update,
-    .render = draw
+    .render = draw,
+    .free = bullet_free
 };
 
-t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
+t_entity* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
 {
     t_bullet* bullet = calloc(1, sizeof(t_bullet));
 
@@ -98,7 +100,7 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
     t_physic_body* body = create_physic_body(def);
     body->stop_on_contact = 0;
 
-    bullet->interface = &interface;
+    bullet->methods = &methods;
     bullet->owner = owner;
     bullet->body = body;
 
@@ -131,7 +133,7 @@ t_bullet* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
         .repeat = 1
     };
 
-    return bullet;
+    return (t_entity*)bullet;
 }
 
 void free_bullet(t_bullet* bullet)

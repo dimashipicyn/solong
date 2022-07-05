@@ -4,97 +4,110 @@
 #include "libft.h"
 #include "bullet.h"
 #include "utils.h"
+#include "entity.h"
+#include "game.h"
 
-extern t_list *entities;
-
-static void fire(t_tank* tank)
+static void fire(t_tank* tank, t_game_ctx* game_ctx)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
     if (diff_time >= 500 * 1) {
         t_vec2 bullet_pos = vec2(tank->body->body.a.x + 12, tank->body->body.a.y + 12);
         t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 17));
-        ft_list_push_back(&entities, new_bullet(pos, tank->body->dir, 1, tank));
+        scene_add_entity(game_ctx->active_scene, new_bullet(pos, tank->body->dir, 1, tank));
 
         tank->last_fire_time = get_time();
     }
 }
 
-void input_player(t_tank* player, t_keys keys)
+static void input_tank(t_entity* entity, t_game_ctx* game_ctx)
 {
-    player->body->velocity = 0;
+    t_tank* tank = (t_tank*)entity;
+    
+    float velocity = 0;
+    t_vec2 dir = tank->body->dir;
+    
+    t_keys keys = game_ctx->keys;
     if (keys.forward) {
-        player->body->velocity = 0.5;
-        player->body->dir = vec2(0, -1);
+        velocity = 0.5;
+        dir = vec2(0, -1);
     }
     else if (keys.backward) {
-        player->body->velocity = 0.5;
-        player->body->dir = vec2(0, 1);
+        velocity = 0.5;
+        dir = vec2(0, 1);
     }
     else if (keys.left_move) {
-        player->body->velocity = 0.5;
-        player->body->dir = vec2(-1, 0);
+        velocity = 0.5;
+        dir = vec2(-1, 0);
     }
     else if (keys.right_move) {
-        player->body->velocity = 0.5;
-        player->body->dir = vec2(1, 0);
-    }
-
-    if (keys.left) {
-        fire(player);
+        velocity = 0.5;
+        dir = vec2(1, 0);
     }
     
-    if ((get_time() - player->birth_date) >= 3000)
+    tank->body->velocity = velocity;
+    tank->body->dir = dir;
+
+    if (keys.left) {
+        fire(tank, game_ctx);
+    }
+    
+    if ((get_time() - tank->birth_date) >= 3000)
     {
-        player->animations = 1;
+        tank->animations = 1;
     }
 }
 
-void update_player(t_tank* player)
+static void update_tank(t_entity* entity, t_game_ctx* game_ctx)
 {
-    if (player->body->dir.y == -1) {
-        player->anim[0].sprite.src.x = 0;
+    t_tank* tank = (t_tank*)entity;
+    
+    t_vec2 dir = tank->body->dir;
+    if (dir.y == -1) {
+        tank->anim[0].sprite.src.x = 0;
     }
-    if (player->body->dir.y == 1) {
-        player->anim[0].sprite.src.x = 64;
+    else if (dir.y == 1) {
+        tank->anim[0].sprite.src.x = 64;
     }
-    if (player->body->dir.x == -1) {
-        player->anim[0].sprite.src.x = 32;
+    else if (dir.x == -1) {
+        tank->anim[0].sprite.src.x = 32;
     }
-    if (player->body->dir.x == 1) {
-        player->anim[0].sprite.src.x = 96;
+    if (dir.x == 1) {
+        tank->anim[0].sprite.src.x = 96;
     }
 
-    if (player->body->velocity > 0.1) {
-        player->anim[0].nframes = 2;
+    if (tank->body->velocity > 0.1) {
+        tank->anim[0].nframes = 2;
     }
     else {
-        player->anim[0].nframes = 1;
+        tank->anim[0].nframes = 1;
     }
 }
 
-void render_player(t_tank* player, t_graphics* graphics, int32_t elapsed)
+static void render_tank(t_entity* entity, t_game_ctx* game_ctx)
 {
-    update_animation(&player->anim[0], elapsed);
-    update_animation(&player->anim[1], elapsed);
+    t_tank* tank = (t_tank*)entity;
+    
+    update_animation(&tank->anim[0], game_ctx->elapsed);
+    update_animation(&tank->anim[1], game_ctx->elapsed);
 
-    for (int i = 0; i < player->animations; i++) {
-        t_sprite s = get_animation_sprite(&player->anim[i]);
-        s.dest.x = player->body->body.a.x - 2;
-        s.dest.y = player->body->body.a.y - 2;
+    for (int i = 0; i < tank->animations; i++) {
+        t_sprite s = get_animation_sprite(&tank->anim[i]);
+        s.dest.x = tank->body->body.a.x - 2;
+        s.dest.y = tank->body->body.a.y - 2;
         
-        draw_sprite_to_frame(graphics, s);
+        draw_sprite_to_frame(game_ctx->graphics, s);
     }
 }
 
-static t_game_object interface = {
-    .input = input_player,
-    .update = update_player,
-    .render = render_player
+static t_entity_methods methods = {
+    .input = input_tank,
+    .update = update_tank,
+    .render = render_tank
 };
 
-void init_player(t_tank* player, t_physic_body* body)
+void init_tank(t_tank* player, t_physic_body* body)
 {
-    player->interface = &interface;
+    player->methods = &methods;
     player->body = body;
 
     t_vec2 pos = body->body.a;
@@ -118,14 +131,14 @@ void init_player(t_tank* player, t_physic_body* body)
     player->birth_date = get_time();
 }
 
-t_tank* new_player(t_physic_body* body)
+t_entity* new_tank(t_physic_body* body)
 {
-    t_tank* player = ft_calloc(1, sizeof(t_tank));
-    init_player(player, body);
-    return player;
+    t_tank* tank = ft_calloc(1, sizeof(t_tank));
+    init_tank(tank, body);
+    return (t_entity*)tank;
 }
 
-void delete_player(t_tank* player)
+void delete_tank(t_tank* player)
 {
     free_physic_body(player->body);
     free(player);

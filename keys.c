@@ -11,9 +11,9 @@
 # define LEFT 123
 # define RIGHT 124
 
-int			key_init(int keycode, t_game* game)
+int			key_init(int keycode, t_game_ctx* game_ctx)
 {
-	t_keys* keys = &game->keys;
+	t_keys* keys = &game_ctx->keys;
 
 	if (keycode == LEFT)
 		keys->left = 1;
@@ -31,9 +31,9 @@ int			key_init(int keycode, t_game* game)
 	return (0);
 }
 
-int			key_destroy(int keycode, t_game* game)
+int			key_destroy(int keycode, t_game_ctx* game_ctx)
 {
-	t_keys* keys = &game->keys;
+	t_keys* keys = &game_ctx->keys;
 
 	if (keycode == LEFT)
 		keys->left = 0;

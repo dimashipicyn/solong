@@ -43,7 +43,7 @@ typedef struct s_sprite {
     t_rect      src; 
 } t_sprite;
 
-typedef struct s_game t_game;
+typedef struct s_game_ctx t_game_ctx;
 
 t_graphics*	init_graphics(int width, int height, char* title);
 void		draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite);

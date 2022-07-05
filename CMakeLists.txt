@@ -32,6 +32,7 @@ set(HEADER_FILES
     physics.h
     vector.h
     animation.h
+    game.h
 )
 
 add_executable(solong 

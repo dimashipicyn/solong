@@ -3,25 +3,26 @@
 
 #include "graphics.h"
 #include "keys.h"
+#include "scene.h"
 
 #include <stdint.h>
 
 typedef struct s_graphics t_graphics;
 typedef struct s_keys t_keys;
-typedef struct s_texture t_texture;
-typedef struct s_map t_map;
-typedef struct s_player t_player;
-typedef struct s_game_map t_game_map;
-typedef struct s_physic_world t_physic_world;
 
-typedef struct s_game {
+typedef enum e_scene_type {
+    MAIN_SCENE,
+    TOTAL_SCENES
+} t_scene_type;
+
+typedef struct s_game_ctx {
     t_graphics  *graphics;
-	t_game_map	*map;
+    t_scene     *scenes[TOTAL_SCENES];
+    t_scene     *active_scene;
     t_keys      keys;
 	int64_t		lag;
 	int64_t		previous_time;
-} t_game;
-
-void load_config(t_game *game);
+    int64_t     elapsed;
+} t_game_ctx;
 
 #endif

@@ -7,38 +7,28 @@
 #include "framerate.h"
 #include "game_map.h"
 #include "settings.h"
+#include "main_scene.h"
 
 #include <stdlib.h>
 #include <time.h>
 
-t_list *entities = NULL;
-t_tank* tank = NULL;
 int loop_callback(void* data)
 {
-    t_game* game = (t_game*)data;
-    t_graphics* graphics = game->graphics;
+    t_game_ctx* game_ctx = (t_game_ctx*)data;
+    t_graphics* graphics = game_ctx->graphics;
     
     int64_t start = get_time();
-    int64_t elapsed = start - game->previous_time;
-    game->previous_time = start;
-    game->lag += elapsed;
+    game_ctx->elapsed = start - game_ctx->previous_time;
+    game_ctx->previous_time = start;
+    game_ctx->lag += game_ctx->elapsed;
 
-    for (t_list* it = entities; it != NULL; it = it->next) {
-        game_object_input(it->content, game->keys);
-    }
-
-    while (game->lag > 5) {
-        ft_list_foreach(entities, game_object_update);
+    while (game_ctx->lag > 5) {
+        scene_update(game_ctx->active_scene, game_ctx);
         step_physic_world();
-        game->lag -= 5;
-    }
-
-    draw_game_map(game->map, game->graphics, tank->body->body.a);
-    
-    for (t_list* it = entities; it != NULL; it = it->next) {
-        game_object_render(it->content, game->graphics, elapsed);
+        game_ctx->lag -= 5;
     }
     
+    scene_render(game_ctx->active_scene, game_ctx);
     //draw_framerate(game->graphics, elapsed);
 
     render_frame(graphics);
@@ -50,7 +40,7 @@ int close_game() {
     exit(0);
 }
 
-void loop(t_game* game)
+void loop(t_game_ctx* game)
 {
     game->previous_time = get_time();
     mlx_hook(game->graphics->window, 2, 1L << 0, key_init, game);
@@ -72,13 +62,13 @@ char* get_current_dir(char** env)
     }
 }
 
-t_game* init_game(char** env)
+t_game_ctx* init_game(char** env)
 {
-    t_game* game = NULL;
+    t_game_ctx* game = NULL;
     t_graphics* graphics = NULL;
     t_game_map* map = NULL;
 
-    game = calloc(1, sizeof(t_game));
+    game = calloc(1, sizeof(t_game_ctx));
     if (!game) {
         ft_printf("Could not initialize game. Bad alloc.\n");
         return NULL;
@@ -105,28 +95,18 @@ t_game* init_game(char** env)
         goto error;
     }
     
-    ft_memset(buf, 0, 256);
-    ft_strlcpy(buf, path_to_cur_dir, 256);
-    ft_strlcat(buf, "/map.ber", 256);
-    map = new_game_map(buf);
-    if (!map) {
-        ft_printf("Could not load map!\n");
-        goto error;
-    }
+//    ft_memset(buf, 0, 256);
+//    ft_strlcpy(buf, path_to_cur_dir, 256);
+//    ft_strlcat(buf, "/map.ber", 256);
+//    map = new_game_map(buf);
+//    if (!map) {
+//        ft_printf("Could not load map!\n");
+//        goto error;
+//    }
 
-    t_physic_body_def def = {
-        .pos = get_start_player_pos(map),
-        .size = vec2(28,28),
-        .dir = vec2(0, -1),
-        .is_dynamic = 1,
-        .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
-    };
-    t_physic_body* tank_body = create_physic_body(def);
-    tank = new_player(tank_body);
-    ft_list_push_back(&entities, tank);
-
+    game->active_scene = new_main_scene();
     game->graphics = graphics;
-    game->map = map;
+    //game->map = map;
     return game;
 
 error:
@@ -138,7 +118,7 @@ error:
 }
 
 int main(int ac, char** argv, char** env) {
-    t_game* game = init_game(env);
+    t_game_ctx* game = init_game(env);
     if (!game) {
         ft_printf("Could not init game!\n");
         return 1;
