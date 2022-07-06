@@ -45,7 +45,7 @@ typedef struct s_game_map
     t_vec2      start_player_pos;
 } t_game_map;
 
-void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
+static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 {
     t_terrain* terrain = (t_terrain*)entity;
     
@@ -57,7 +57,7 @@ void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
     }
 }
 
-static t_entity_methods methods = {
+static t_entity_methods map_methods = {
     .damage = damage
 };
 
@@ -125,7 +125,7 @@ void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
 {
     terrain->type = type;
     terrain->body = NULL;
-    terrain->methods = &methods;
+    terrain->methods = &map_methods;
     terrain->armor = get_armor_from_type(type);
 
     if (type == BRICK || type == WATER || type == CONCRETE)

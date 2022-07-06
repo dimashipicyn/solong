@@ -9,13 +9,15 @@ set(SOURCE_FILES
     tank.c
     texture.c
     utils.c
-    game_object.c
+    entity.c
     framerate.c
     game_map.c
     bullet.c
     physics.c
     vector.c
     animation.c
+    scene.c
+    main_scene.c
 )
 
 set(HEADER_FILES 
@@ -25,7 +27,7 @@ set(HEADER_FILES
     tank.h
     texture.h
     utils.h
-    game_object.h
+    entity.h
     framerate.h
     game_map.h
     bullet.h
@@ -33,6 +35,8 @@ set(HEADER_FILES
     vector.h
     animation.h
     game.h
+    scene.h
+    main_scene.h
 )
 
 add_executable(solong 
