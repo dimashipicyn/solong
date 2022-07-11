@@ -99,20 +99,41 @@ static void render_tank(t_entity* entity, t_game_ctx* game_ctx)
     }
 }
 
+static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    if (!tank->armor) {
+        tank->xp -= damage;
+    }
+    if (tank->xp <= 0) {
+        tank->is_alive = 0;
+    }
+}
+
+static int is_alive(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    return tank->is_alive;
+}
+
 static t_entity_methods methods = {
     .input = input_tank,
     .update = update_tank,
-    .render = render_tank
+    .render = render_tank,
+    .damage = damage,
+    .is_alive = is_alive,
+    .free = delete_tank
 };
 
-void init_tank(t_tank* player, t_physic_body* body)
+void init_tank(t_tank* tank, t_physic_body* body)
 {
-    player->methods = &methods;
-    player->body = body;
+    tank->methods = &methods;
+    tank->body = body;
 
     t_vec2 pos = body->body.a;
     
-    t_sprite tank = (t_sprite){
+    t_sprite tank_sprite = (t_sprite){
         .dest = (t_rect){pos.x,pos.y,32,32},
         .src = (t_rect){0,0,16,16},
         .texture = get_texture(TANK_RED_TXR_ID)
@@ -124,11 +145,14 @@ void init_tank(t_tank* player, t_physic_body* body)
         .texture = get_texture(EFFECTS_TXR_ID)
     };
     
-    player->anim[TANK_ANIMATION] = animation(tank, 1, 200, 1);
-    player->anim[ARMOR_ANIMATION] = animation(armor, 2, 50, 1);
-    player->animations = 2;
+    tank->anim[TANK_ANIMATION] = animation(tank_sprite, 1, 200, 1);
+    tank->anim[ARMOR_ANIMATION] = animation(armor, 2, 50, 1);
+    tank->animations = 2;
     
-    player->birth_date = get_time();
+    tank->birth_date = get_time();
+    tank->is_alive = 1;
+    tank->armor = 1;
+    tank->xp = 100;
 }
 
 t_entity* new_tank(t_physic_body* body)

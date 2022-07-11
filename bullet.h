@@ -15,6 +15,7 @@ typedef struct bullet {
     t_tank*         owner;
     t_animation     anim;
     int             state;
+    int8_t          is_alive;
 } t_bullet;
 
 t_entity* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner);

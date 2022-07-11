@@ -12,6 +12,7 @@ typedef struct s_entity_methods
     void (*update)(t_entity* entity, t_game_ctx* game_ctx);
     void (*render)(t_entity* entity, t_game_ctx* game_ctx);
     void (*damage)(t_entity* entity, t_game_ctx* game_ctx, int32_t damage);
+    int (*is_alive)(t_entity* entity);
     void (*free)(t_entity* entity);
 } t_entity_methods;
 
@@ -24,6 +25,7 @@ void entity_input(t_entity* entity, t_game_ctx* game_ctx);
 void entity_update(t_entity* entity, t_game_ctx* game_ctx);
 void entity_render(t_entity* entity, t_game_ctx* game_ctx);
 void entity_damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage);
+int entity_is_alive(t_entity* entity);
 void entity_free(t_entity* entity);
 
 #endif

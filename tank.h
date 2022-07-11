@@ -24,6 +24,9 @@ typedef struct s_tank
     int64_t         last_fire_time;
     int64_t         birth_date;
     int32_t         animations;
+    int8_t          xp;
+    int8_t          armor;
+    int8_t          is_alive;
 } t_tank;
 
 t_entity* new_tank(t_physic_body* body);

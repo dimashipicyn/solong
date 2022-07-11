@@ -53,7 +53,7 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
         case END: {
             t_entity* contacted_entity = bullet->body->contacted_body->user_data;
             entity_damage(contacted_entity, game_ctx, 100);
-            scene_remove_entity(game_ctx->active_scene, entity);
+            bullet->is_alive = 0;
             break;
         }
     }
@@ -72,6 +72,12 @@ static void draw(t_entity* entity, t_game_ctx* game_ctx)
     draw_sprite_to_frame(game_ctx->graphics, s);
 }
 
+static int is_alive(t_entity* entity)
+{
+    t_bullet* bullet = (t_bullet*)entity;
+    return bullet->is_alive;
+}
+
 static void bullet_free(t_entity* entity)
 {
     t_bullet* bullet = (t_bullet*)entity;
@@ -82,6 +88,7 @@ static t_entity_methods methods = {
     .input = input,
     .update = update,
     .render = draw,
+    .is_alive = is_alive,
     .free = bullet_free
 };
 
@@ -103,6 +110,7 @@ t_entity* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
     bullet->methods = &methods;
     bullet->owner = owner;
     bullet->body = body;
+    bullet->is_alive = 1;
 
     t_sprite sprite;
     sprite.texture = get_texture(BULLET_TXR_ID);

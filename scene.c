@@ -32,11 +32,6 @@ void scene_add_entity(t_scene* scene, t_entity* entity)
     scene->methods->add_entity(scene, entity);
 }
 
-void scene_remove_entity(t_scene* scene, t_entity* entity)
-{
-    scene->methods->remove_entity(scene, entity);
-}
-
 void scene_free(t_scene* scene)
 {
     scene->methods->free(scene);
