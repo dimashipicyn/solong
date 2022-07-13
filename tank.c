@@ -6,6 +6,108 @@
 #include "utils.h"
 #include "entity.h"
 #include "game.h"
+#include "command.h"
+
+void move_left_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    tank->body->velocity = 0.5;
+    tank->body->dir = vec2(-1, 0);
+}
+
+void move_right_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    tank->body->velocity = 0.5;
+    tank->body->dir = vec2(1, 0);
+}
+
+void move_forw_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    tank->body->velocity = 0.5;
+    tank->body->dir = vec2(0, -1);
+}
+
+void move_back_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    tank->body->velocity = 0.5;
+    tank->body->dir = vec2(0, 1);
+}
+
+void fire_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+}
+
+void stop_command(t_entity* entity)
+{
+    t_tank* tank = (t_tank*)entity;
+    
+    tank->body->velocity = 0;
+}
+
+t_command player_one_input(t_game_ctx* game_ctx)
+{
+    t_keys keys = game_ctx->keys;
+    if (keys.pressed[K_CODE_W]) {
+        return command(move_forw_command);
+    }
+    else if (keys.pressed[K_CODE_S]) {
+        return command(move_back_command);
+    }
+    else if (keys.pressed[K_CODE_A]) {
+        return command(move_left_command);
+    }
+    else if (keys.pressed[K_CODE_D]) {
+        return command(move_right_command);
+    }
+    return command(stop_command);
+}
+
+t_command player_two_input(t_game_ctx* game_ctx)
+{
+    t_keys keys = game_ctx->keys;
+    if (keys.pressed[K_CODE_TOP]) {
+        return command(move_forw_command);
+    }
+    else if (keys.pressed[K_CODE_BOTTOM]) {
+        return command(move_back_command);
+    }
+    else if (keys.pressed[K_CODE_LEFT]) {
+        return command(move_left_command);
+    }
+    else if (keys.pressed[K_CODE_RIGHT]) {
+        return command(move_right_command);
+    }
+    return command(stop_command);
+}
+
+t_command ii_input(t_game_ctx* game_ctx)
+{
+    int n = abs(rand()) % 60;
+    switch (n) {
+        case 0:
+            return command(move_forw_command);
+        case 1:
+            return command(move_back_command);
+        case 2:
+            return command(move_left_command);
+        case 3:
+            return command(move_right_command);
+        case 4:
+            return command(fire_command);
+        default:
+            break;
+    }
+    return command(stop_command);
+}
 
 static void fire(t_tank* tank, t_game_ctx* game_ctx)
 {
@@ -23,37 +125,11 @@ static void input_tank(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
-    float velocity = 0;
-    t_vec2 dir = tank->body->dir;
+    t_command cmd = tank->input(game_ctx);
+    command_execute(cmd, entity);
     
-    t_keys keys = game_ctx->keys;
-    if (keys.forward) {
-        velocity = 0.5;
-        dir = vec2(0, -1);
-    }
-    else if (keys.backward) {
-        velocity = 0.5;
-        dir = vec2(0, 1);
-    }
-    else if (keys.left_move) {
-        velocity = 0.5;
-        dir = vec2(-1, 0);
-    }
-    else if (keys.right_move) {
-        velocity = 0.5;
-        dir = vec2(1, 0);
-    }
-    
-    tank->body->velocity = velocity;
-    tank->body->dir = dir;
-
-    if (keys.left) {
+    if (game_ctx->keys.pressed[K_CODE_F]) {
         fire(tank, game_ctx);
-    }
-    
-    if ((get_time() - tank->birth_date) >= 3000)
-    {
-        tank->animations = 1;
     }
 }
 
@@ -80,6 +156,12 @@ static void update_tank(t_entity* entity, t_game_ctx* game_ctx)
     }
     else {
         tank->anim[0].nframes = 1;
+    }
+    
+    if ((get_time() - tank->birth_date) >= 3000)
+    {
+        tank->armor = 0;
+        tank->animations = 1;
     }
 }
 
@@ -155,15 +237,15 @@ void init_tank(t_tank* tank, t_physic_body* body)
     tank->xp = 100;
 }
 
-t_entity* new_tank(t_physic_body* body)
+t_tank* new_tank(t_physic_body* body)
 {
     t_tank* tank = ft_calloc(1, sizeof(t_tank));
     init_tank(tank, body);
-    return (t_entity*)tank;
+    return tank;
 }
 
-void delete_tank(t_tank* player)
+void delete_tank(t_tank* tank)
 {
-    free_physic_body(player->body);
-    free(player);
+    free_physic_body(tank->body);
+    free(tank);
 }

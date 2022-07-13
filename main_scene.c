@@ -56,9 +56,15 @@ t_scene* new_main_scene()
         .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
     };
     
-    t_entity* tank = new_tank(create_physic_body(def));
+    t_tank* tank = new_tank(create_physic_body(def));
+    tank->input = player_one_input;
+    
+    def.pos = vec2_add(def.pos, vec2(100, 0));
+    t_tank* tank_1 = new_tank(create_physic_body(def));
+    tank_1->input = player_two_input;
     
     ft_list_push_back(&scene->entities, tank);
+    ft_list_push_back(&scene->entities, tank_1);
     return (t_scene*)scene;
 }
 

@@ -43,8 +43,8 @@ int close_game() {
 void loop(t_game_ctx* game)
 {
     game->previous_time = get_time();
-    mlx_hook(game->graphics->window, 2, 1L << 0, key_init, game);
-    mlx_hook(game->graphics->window, 3, 1L << 1, key_destroy, game);
+    mlx_hook(game->graphics->window, 2, 1L << 0, key_init, &game->keys);
+    mlx_hook(game->graphics->window, 3, 1L << 1, key_destroy, &game->keys);
     mlx_hook(game->graphics->window, 17, 0, close_game, game);
     mlx_loop_hook(game->graphics->mlx, &loop_callback, game);
     mlx_loop(game->graphics->mlx);

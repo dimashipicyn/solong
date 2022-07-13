@@ -7,17 +7,15 @@
 #ifndef command_h
 #define command_h
 
+#include "entity.h"
 #include <stdint.h>
 
 typedef struct s_command
 {
-    int8_t forw;
-    int8_t back;
-    int8_t left;
-    int8_t right;
-    int8_t fire;
+    void (*execute)(t_entity* entity);
 } t_command;
 
-t_command command();
+t_command command(void (*execute)(t_entity* entity));
+void command_execute(t_command command, t_entity* entity);
 
 #endif /* command_h */

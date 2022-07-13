@@ -75,6 +75,20 @@ void step_physic_world()
                 break;
             }
         }
+        
+        for (t_list* it2 = w->dynamic_bodies; it2 != NULL; it2 = it2->next)
+        {
+            if (it1 == it2) {
+                continue;
+            }
+            
+            t_physic_body* body_2 = it2->content;
+            if (body_1->layer & body_2->layer && intersect(move_rect, body_2->body)) {
+                body_1->contact = 1;
+                body_1->contacted_body = body_2;
+                break;
+            }
+        }
 
         if (!body_1->contact) {
             body_1->body = move_rect;

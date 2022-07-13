@@ -16,10 +16,14 @@ enum {
     TOTAL_ANIMATIONS
 };
 
+typedef struct s_command t_command;
+typedef t_command (*handleInput)(t_game_ctx* game_ctx);
+
 typedef struct s_tank
 {
     t_entity_methods *methods;
     t_physic_body   *body;
+    handleInput     input;
     t_animation     anim[TOTAL_ANIMATIONS];
     int64_t         last_fire_time;
     int64_t         birth_date;
@@ -29,7 +33,11 @@ typedef struct s_tank
     int8_t          is_alive;
 } t_tank;
 
-t_entity* new_tank(t_physic_body* body);
+t_tank* new_tank(t_physic_body* body);
 void delete_tank(t_tank* tank);
+
+t_command player_one_input(t_game_ctx* game_ctx);
+t_command player_two_input(t_game_ctx* game_ctx);
+t_command ii_input(t_game_ctx* game_ctx);
 
 #endif
