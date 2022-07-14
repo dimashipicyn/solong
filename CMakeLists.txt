@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(solong VERSION 0.1.0)
 
+add_compile_options(-Wall -Wextra -pedantic)
+
 set(SOURCE_FILES 
     main.c
     keys.c
@@ -18,6 +20,7 @@ set(SOURCE_FILES
     animation.c
     scene.c
     main_scene.c
+	command.c
 )
 
 set(HEADER_FILES 

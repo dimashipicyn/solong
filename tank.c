@@ -158,7 +158,7 @@ static void update_tank(t_entity* entity, t_game_ctx* game_ctx)
         tank->anim[0].nframes = 1;
     }
     
-    if ((get_time() - tank->birth_date) >= 3000)
+    if ((get_time() - tank->birth_date) >= 10000)
     {
         tank->armor = 0;
         tank->animations = 1;
@@ -212,6 +212,7 @@ void init_tank(t_tank* tank, t_physic_body* body)
 {
     tank->methods = &methods;
     tank->body = body;
+	body->user_data = tank;
 
     t_vec2 pos = body->body.a;
     
@@ -234,7 +235,7 @@ void init_tank(t_tank* tank, t_physic_body* body)
     tank->birth_date = get_time();
     tank->is_alive = 1;
     tank->armor = 1;
-    tank->xp = 100;
+    tank->xp = 110;
 }
 
 t_tank* new_tank(t_physic_body* body)

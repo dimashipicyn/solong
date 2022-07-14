@@ -107,6 +107,7 @@ void main_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
         void *entity = it->content;
         if (!entity_is_alive(entity)) {
             it = it->next;
+			entity_free(entity);
             ft_list_remove_if(&scene->entities, entity, entity_cmp);
         }
         else {

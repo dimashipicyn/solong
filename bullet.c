@@ -84,10 +84,16 @@ static void bullet_free(t_entity* entity)
     free_bullet(bullet);
 }
 
+static void bullet_damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
+{
+
+}
+
 static t_entity_methods methods = {
     .input = input,
     .update = update,
     .render = draw,
+	.damage = bullet_damage,
     .is_alive = is_alive,
     .free = bullet_free
 };
@@ -106,6 +112,7 @@ t_entity* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
     };
     t_physic_body* body = create_physic_body(def);
     body->stop_on_contact = 0;
+	body->user_data = bullet;
 
     bullet->methods = &methods;
     bullet->owner = owner;
