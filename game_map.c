@@ -19,6 +19,8 @@ typedef enum {
     FOREST      = '4' - '0',
     ICE         = '5' - '0',
     PLAYER_1    = 'P' - '0',
+	PLAYER_2    = 'T' - '0',
+	ENEMY    	= 'E' - '0',
     BASE_OREL   = 'B' - '0',
     TILE_TYPE_SIZE
 } t_tile_type;
@@ -40,13 +42,17 @@ typedef struct s_terrain
 typedef struct s_game_map
 {
 	t_terrain*  tiles;
-	int32_t     width;
-	int32_t     height;
-    t_vec2      start_player_pos;
+	size_t		width;
+	size_t		height;
+    t_vec2      player_one_spawn_pos;
+	t_vec2      player_two_spawn_pos;
+	t_vec2      enemies_spawn_pos;
 } t_game_map;
 
 static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 {
+	(void)game_ctx;
+
     t_terrain* terrain = (t_terrain*)entity;
     
     terrain->armor -= damage;
@@ -61,7 +67,7 @@ static t_entity_methods map_methods = {
     .damage = damage
 };
 
-static t_sprite sprites[TILE_TYPE_SIZE] = {};
+static t_sprite sprites[TILE_TYPE_SIZE];
 
 static int load_map(t_game_map* map, char* filename);
 
@@ -74,13 +80,13 @@ t_game_map* new_game_map(char* filename)
         return NULL;
     }
 
-    sprites[EMPTY] = (t_sprite){get_texture(DIRT_TXR_ID), {0,0,16,16}, {0,0,16,16}};
-    sprites[BRICK] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {0,0,8,8}};
-    sprites[CONCRETE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {8,0,8,8}};
-    sprites[FOREST] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {16,0,8,8}};
-    sprites[ICE] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
-    sprites[WATER] = (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
-    sprites[BASE_OREL] = (t_sprite){get_texture(OREL_TXR_ID), {0,0,32,32}, {0,0,16,16}};
+    sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID), {0,0,16,16}, {0,0,16,16}};
+    sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {0,0,8,8}};
+    sprites[CONCRETE]	= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {8,0,8,8}};
+    sprites[FOREST]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {16,0,8,8}};
+    sprites[ICE]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
+    sprites[WATER]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
+    sprites[BASE_OREL]	= (t_sprite){get_texture(OREL_TXR_ID), {0,0,32,32}, {0,0,16,16}};
     
     return map;
 }
@@ -189,7 +195,17 @@ static int load_map(t_game_map* map, char* filename)
 
             if (type == PLAYER_1)
             {
-                map->start_player_pos = vec2(x * 16, y * 16);
+                map->player_one_spawn_pos = vec2(x * 16, y * 16);
+                it_tiles->type = EMPTY;
+            }
+			if (type == PLAYER_2)
+            {
+                map->player_two_spawn_pos = vec2(x * 16, y * 16);
+                it_tiles->type = EMPTY;
+            }
+			if (type == ENEMY)
+            {
+                map->enemies_spawn_pos = vec2(x * 16, y * 16);
                 it_tiles->type = EMPTY;
             }
 
@@ -215,7 +231,7 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
     size_t col;
     t_terrain* tiles;
     
-    t_sprite orel = {};
+    t_sprite orel = {0};
 
     row = 0;
     tiles = game_map->tiles;
@@ -247,7 +263,17 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
     draw_sprite_to_frame(graphics, orel);
 }
 
-t_vec2 get_start_player_pos(t_game_map* map)
+t_vec2 get_player_one_spawn_pos(t_game_map* map)
 {
-    return map->start_player_pos;
+    return map->player_one_spawn_pos;
+}
+
+t_vec2 get_player_two_spawn_pos(t_game_map* map)
+{
+	return map->player_two_spawn_pos;
+}
+
+t_vec2 get_enemies_spawn_pos(t_game_map* map)
+{
+	return map->enemies_spawn_pos;
 }

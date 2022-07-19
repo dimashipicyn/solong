@@ -27,14 +27,16 @@ void	ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)())
 		if ((*cmp)(data_ref, list->content) == 0)
 		{
 			tmp = list;
+			list = list->next;
 			if (!prev)
-				*begin_list = list->next;
+				*begin_list = list;
 			else
-				prev->next = list->next;
+				prev->next = list;
 			free(tmp);
 		}
-		else
+		else {
 			prev = list;
-		list = list->next;
+			list = list->next;
+		}
 	}
 }

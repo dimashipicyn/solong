@@ -39,6 +39,22 @@ static t_scene_methods methods = {
     .free = main_scene_free
 };
 
+t_entity* tank_factory(t_vec2 pos)
+{
+	t_physic_body_def def = {
+        .pos = pos,
+        .size = vec2(28,28),
+        .dir = vec2(0, -1),
+        .is_dynamic = 1,
+        .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
+    };
+
+	t_tank* tank_1 = new_tank(create_physic_body(def));
+    tank_1->input = ii_input;
+
+	return (t_entity*)tank_1;
+}
+
 t_scene* new_main_scene()
 {
     t_main_scene* scene = calloc(1, sizeof(t_main_scene));
@@ -49,7 +65,7 @@ t_scene* new_main_scene()
     scene->game_map = new_game_map("map.ber");
     
     t_physic_body_def def = {
-        .pos = get_start_player_pos(scene->game_map),
+        .pos = get_player_one_spawn_pos(scene->game_map),
         .size = vec2(28,28),
         .dir = vec2(0, -1),
         .is_dynamic = 1,
@@ -59,12 +75,10 @@ t_scene* new_main_scene()
     t_tank* tank = new_tank(create_physic_body(def));
     tank->input = player_one_input;
     
-    def.pos = vec2_add(def.pos, vec2(100, 0));
-    t_tank* tank_1 = new_tank(create_physic_body(def));
-    tank_1->input = player_two_input;
-    
     ft_list_push_back(&scene->entities, tank);
-    ft_list_push_back(&scene->entities, tank_1);
+    ft_list_push_back(&scene->entities, tank_factory(vec2(17, 17)));
+	ft_list_push_back(&scene->entities, tank_factory(vec2(50, 17)));
+	ft_list_push_back(&scene->entities, tank_factory(vec2(300, 17)));
     return (t_scene*)scene;
 }
 
@@ -137,13 +151,6 @@ void main_scene_add_entity(t_scene* _scene, t_entity* entity)
     t_main_scene* scene = (t_main_scene*)_scene;
     
     ft_list_push_back(&scene->added_entities, entity);
-}
-
-void main_scene_remove_entity(t_scene* _scene, t_entity* entity)
-{
-    t_main_scene* scene = (t_main_scene*)_scene;
-    
-    ft_list_push_back(&scene->entities, entity);
 }
 
 void main_scene_free(t_scene* _scene)

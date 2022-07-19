@@ -8,7 +8,7 @@
 #include "game.h"
 #include "command.h"
 
-void move_left_command(t_entity* entity)
+void move_left_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
@@ -16,7 +16,7 @@ void move_left_command(t_entity* entity)
     tank->body->dir = vec2(-1, 0);
 }
 
-void move_right_command(t_entity* entity)
+void move_right_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
@@ -24,7 +24,7 @@ void move_right_command(t_entity* entity)
     tank->body->dir = vec2(1, 0);
 }
 
-void move_forw_command(t_entity* entity)
+void move_forw_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
@@ -32,28 +32,29 @@ void move_forw_command(t_entity* entity)
     tank->body->dir = vec2(0, -1);
 }
 
-void move_back_command(t_entity* entity)
+void move_back_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
     tank->body->velocity = 0.5;
     tank->body->dir = vec2(0, 1);
 }
-
-void fire_command(t_entity* entity)
+static void fire(t_tank* tank, t_game_ctx* game_ctx);
+void fire_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
-    
+
+	fire(tank, game_ctx);
 }
 
-void stop_command(t_entity* entity)
+void stop_command(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
     tank->body->velocity = 0;
 }
 
-t_command player_one_input(t_game_ctx* game_ctx)
+t_command player_one_input(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_keys keys = game_ctx->keys;
     if (keys.pressed[K_CODE_W]) {
@@ -68,10 +69,13 @@ t_command player_one_input(t_game_ctx* game_ctx)
     else if (keys.pressed[K_CODE_D]) {
         return command(move_right_command);
     }
+	else if (keys.pressed[K_CODE_F]) {
+        return command(fire_command);
+    }
     return command(stop_command);
 }
 
-t_command player_two_input(t_game_ctx* game_ctx)
+t_command player_two_input(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_keys keys = game_ctx->keys;
     if (keys.pressed[K_CODE_TOP]) {
@@ -86,12 +90,15 @@ t_command player_two_input(t_game_ctx* game_ctx)
     else if (keys.pressed[K_CODE_RIGHT]) {
         return command(move_right_command);
     }
+	else if (keys.pressed[K_CODE_L_ALT]) {
+        return command(fire_command);
+    }
     return command(stop_command);
 }
 
-t_command ii_input(t_game_ctx* game_ctx)
+t_command rand_command()
 {
-    int n = abs(rand()) % 60;
+	int n = abs(rand()) % 6;
     switch (n) {
         case 0:
             return command(move_forw_command);
@@ -106,13 +113,26 @@ t_command ii_input(t_game_ctx* game_ctx)
         default:
             break;
     }
-    return command(stop_command);
+    return command(NULL);
 }
 
-static void fire(t_tank* tank, t_game_ctx* game_ctx)
+t_command ii_input(t_entity* entity, t_game_ctx* game_ctx)
+{
+	t_tank* tank = (t_tank*)entity;
+	if (tank->body->velocity == 0) {
+		return rand_command();
+	}
+	int r = abs(rand()) % 100;
+	if (r < 99) {
+		return command(NULL);
+	}
+	return command(fire_command);
+}
+
+void fire(t_tank* tank, t_game_ctx* game_ctx)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
-    if (diff_time >= 500 * 1) {
+    if (diff_time >= 1000 * 1) {
         t_vec2 bullet_pos = vec2(tank->body->body.a.x + 12, tank->body->body.a.y + 12);
         t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 17));
         scene_add_entity(game_ctx->active_scene, new_bullet(pos, tank->body->dir, 1, tank));
@@ -125,12 +145,12 @@ static void input_tank(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
     
-    t_command cmd = tank->input(game_ctx);
-    command_execute(cmd, entity);
+    t_command cmd = tank->input(entity, game_ctx);
+    command_execute(cmd, entity, game_ctx);
     
-    if (game_ctx->keys.pressed[K_CODE_F]) {
-        fire(tank, game_ctx);
-    }
+//    if (game_ctx->keys.pressed[K_CODE_F]) {
+//        fire(tank, game_ctx);
+//    }
 }
 
 static void update_tank(t_entity* entity, t_game_ctx* game_ctx)

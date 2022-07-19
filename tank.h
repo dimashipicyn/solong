@@ -17,7 +17,7 @@ enum {
 };
 
 typedef struct s_command t_command;
-typedef t_command (*handleInput)(t_game_ctx* game_ctx);
+typedef t_command (*handleInput)(t_entity* entity, t_game_ctx* game_ctx);
 
 typedef struct s_tank
 {
@@ -36,8 +36,8 @@ typedef struct s_tank
 t_tank* new_tank(t_physic_body* body);
 void delete_tank(t_tank* tank);
 
-t_command player_one_input(t_game_ctx* game_ctx);
-t_command player_two_input(t_game_ctx* game_ctx);
-t_command ii_input(t_game_ctx* game_ctx);
+t_command player_one_input(t_entity* entity, t_game_ctx* game_ctx);
+t_command player_two_input(t_entity* entity, t_game_ctx* game_ctx);
+t_command ii_input(t_entity* entity, t_game_ctx* game_ctx);
 
 #endif

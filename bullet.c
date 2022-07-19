@@ -40,6 +40,9 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
                 };
                 bullet->anim = animation(sprite, 3, 300, 0);
                 bullet->state = EXPLOSION;
+
+				t_entity* contacted_entity = bullet->body->contacted_body->user_data;
+				entity_damage(contacted_entity, game_ctx, 100);
             }
             break;
         }
@@ -51,8 +54,6 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
             break;   
         }
         case END: {
-            t_entity* contacted_entity = bullet->body->contacted_body->user_data;
-            entity_damage(contacted_entity, game_ctx, 100);
             bullet->is_alive = 0;
             break;
         }

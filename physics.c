@@ -72,6 +72,7 @@ void step_physic_world()
             if (body_1->layer & body_2->layer && intersect(move_rect, body_2->body)) {
                 body_1->contact = 1;
                 body_1->contacted_body = body_2;
+				body_1->velocity = 0;
                 break;
             }
         }
@@ -86,8 +87,10 @@ void step_physic_world()
             if (body_1->layer & body_2->layer && intersect(move_rect, body_2->body)) {
                 body_1->contact = 1;
                 body_1->contacted_body = body_2;
+				body_1->velocity = 0;
 				body_2->contact = 1;
 				body_2->contacted_body = body_1;
+				body_2->velocity = 0;
                 break;
             }
         }
