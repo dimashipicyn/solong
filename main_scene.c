@@ -14,6 +14,7 @@
 
 #include "libft.h"
 #include <stdlib.h>
+#include <assert.h>
 
 typedef struct s_main_scene
 {
@@ -39,20 +40,21 @@ static t_scene_methods methods = {
     .free = main_scene_free
 };
 
-t_entity* tank_factory(t_vec2 pos)
+t_tank* tank_factory(t_main_scene* scene)
 {
-	t_physic_body_def def = {
-        .pos = pos,
-        .size = vec2(28,28),
-        .dir = vec2(0, -1),
-        .is_dynamic = 1,
-        .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
-    };
+	t_vec2 pos = get_enemies_spawn_pos(scene->game_map);
+	t_tank_def def;
+	def.pos = vec2(pos.x + 1, pos.y + 1);
+	def.dir = vec2(0, -1);
+	def.input_type = ENEMY_INPUT_TYPE;
+	def.damage = 100;
+	def.hitpoints = 100;
+	def.recharge_time = 1000;
+	def.velocity = 1;
 
-	t_tank* tank_1 = new_tank(create_physic_body(def));
-    tank_1->input = ii_input;
+	t_tank* tank = new_tank(def);
 
-	return (t_entity*)tank_1;
+	return tank;
 }
 
 t_scene* new_main_scene()
@@ -62,39 +64,59 @@ t_scene* new_main_scene()
     scene->methods = &methods;
     
     scene->entities = NULL;
-    scene->game_map = new_game_map("map.ber");
-    
-    t_physic_body_def def = {
-        .pos = get_player_one_spawn_pos(scene->game_map),
-        .size = vec2(28,28),
-        .dir = vec2(0, -1),
-        .is_dynamic = 1,
-        .layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2
-    };
-    
-    t_tank* tank = new_tank(create_physic_body(def));
-    tank->input = player_one_input;
-    
-    ft_list_push_back(&scene->entities, tank);
-    ft_list_push_back(&scene->entities, tank_factory(vec2(17, 17)));
-	ft_list_push_back(&scene->entities, tank_factory(vec2(50, 17)));
-	ft_list_push_back(&scene->entities, tank_factory(vec2(300, 17)));
+	scene->added_entities = NULL;
+	scene->game_map = NULL;
+
     return (t_scene*)scene;
 }
 
-void delete_main_scene(t_scene* scene)
+void delete_main_scene(t_scene* _scene)
 {
-    scene->methods->free(scene);
+	t_main_scene* scene = (t_main_scene*)_scene;
+
+	assert(scene);
+
+	for (t_list* it = scene->entities; it != NULL; it = it->next) {
+		entity_free(it->content);
+	}
+	ft_list_clear(&scene->entities);
+	ft_list_clear(&scene->added_entities);
+
+	delete_game_map(scene->game_map);
 }
 
 void main_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 {
+	(void)game_ctx;
     t_main_scene* scene = (t_main_scene*)_scene;
+
+	scene->game_map = new_game_map("map.ber");
 }
 
 void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 {
+	(void)game_ctx;
     t_main_scene* scene = (t_main_scene*)_scene;
+
+	t_tank_def def;
+	def.pos = get_player_one_spawn_pos(scene->game_map);
+	def.dir = vec2(0, -1);
+	def.input_type = PLAYER_ONE_INPUT_TYPE;
+	def.damage = 100;
+	def.hitpoints = 100;
+	def.recharge_time = 1000;
+	def.velocity = 1;
+
+	t_tank* player_one = new_tank(def);
+
+	def.pos = get_player_two_spawn_pos(scene->game_map);
+	def.input_type = PLAYER_TWO_INPUT_TYPE;
+
+	t_tank* player_two = new_tank(def);
+
+	ft_list_push_back(&scene->entities, player_one);
+	ft_list_push_back(&scene->entities, player_two);
+    ft_list_push_back(&scene->entities, tank_factory(scene));
 }
 
 static int entity_cmp(void* t, void* p)
@@ -153,7 +175,7 @@ void main_scene_add_entity(t_scene* _scene, t_entity* entity)
     ft_list_push_back(&scene->added_entities, entity);
 }
 
-void main_scene_free(t_scene* _scene)
+void main_scene_free(t_scene* scene)
 {
-    t_main_scene* scene = (t_main_scene*)_scene;
+	delete_main_scene(scene);
 }

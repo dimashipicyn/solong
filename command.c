@@ -6,7 +6,7 @@
 
 #include "command.h"
 
-t_command command(void (*execute)(t_entity* entity))
+t_command command(void (*execute)(t_entity* entity, t_game_ctx* game_ctx))
 {
     return (t_command){execute};
 }

@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+static const int32_t tick_time = 1000 / 60;
+
 int loop_callback(void* data)
 {
     t_game_ctx* game_ctx = (t_game_ctx*)data;
@@ -22,10 +24,10 @@ int loop_callback(void* data)
     game_ctx->previous_time = start;
     game_ctx->lag += game_ctx->elapsed;
 
-    while (game_ctx->lag > 5) {
+    while (game_ctx->lag > tick_time) {
         scene_update(game_ctx->active_scene, game_ctx);
         step_physic_world();
-        game_ctx->lag -= 5;
+        game_ctx->lag -= tick_time;
     }
     
     scene_render(game_ctx->active_scene, game_ctx);
@@ -60,6 +62,7 @@ char* get_current_dir(char** env)
         }
         env++;
     }
+	return "";
 }
 
 t_game_ctx* init_game(char** env)
@@ -94,19 +97,17 @@ t_game_ctx* init_game(char** env)
         ft_printf("Loading textures failed.\n");
         goto error;
     }
-    
-//    ft_memset(buf, 0, 256);
-//    ft_strlcpy(buf, path_to_cur_dir, 256);
-//    ft_strlcat(buf, "/map.ber", 256);
-//    map = new_game_map(buf);
-//    if (!map) {
-//        ft_printf("Could not load map!\n");
-//        goto error;
-//    }
 
-    game->active_scene = new_main_scene();
+	game->scenes[MAIN_SCENE] = new_main_scene();
+
+	for (int i = 0; i < TOTAL_SCENES; i++) {
+		scene_preload(game->scenes[i], game);
+		scene_create(game->scenes[i], game);
+	}
+
+	game->active_scene = game->scenes[MAIN_SCENE];
     game->graphics = graphics;
-    //game->map = map;
+	
     return game;
 
 error:

@@ -49,7 +49,6 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
         case EXPLOSION: {
             if (bullet->anim.is_end) {
                 bullet->state = END;
-                bullet->anim.nframes = 0;
             }
             break;   
         }

@@ -65,7 +65,7 @@ typedef enum {
 
 typedef struct s_keys
 {
-    int8_t pressed[160];
+    int8_t pressed[300];
 } t_keys;
 
 int		key_init(int keycode, t_keys* keys);
