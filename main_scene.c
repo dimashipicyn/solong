@@ -51,6 +51,7 @@ t_tank* tank_factory(t_main_scene* scene)
 	def.hitpoints = 100;
 	def.recharge_time = 1000;
 	def.velocity = 1;
+	def.bullet_velocity = 3;
 
 	t_tank* tank = new_tank(def);
 
@@ -102,10 +103,11 @@ void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 	def.pos = get_player_one_spawn_pos(scene->game_map);
 	def.dir = vec2(0, -1);
 	def.input_type = PLAYER_ONE_INPUT_TYPE;
-	def.damage = 100;
-	def.hitpoints = 100;
+	def.damage = 10;
+	def.hitpoints = 127;
 	def.recharge_time = 1000;
 	def.velocity = 1;
+	def.bullet_velocity = 2;
 
 	t_tank* player_one = new_tank(def);
 

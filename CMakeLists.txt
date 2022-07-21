@@ -40,6 +40,7 @@ set(HEADER_FILES
     game.h
     scene.h
     main_scene.h
+	command.h
 )
 
 add_executable(solong 

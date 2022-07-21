@@ -169,8 +169,16 @@ void fire(t_tank* tank, t_game_ctx* game_ctx)
     int64_t diff_time = get_time() - tank->last_fire_time;
     if (diff_time >= tank->recharge_time) {
         t_vec2 bullet_pos = vec2(tank->body->body.a.x + 14, tank->body->body.a.y + 14);
-        t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 18));
-        scene_add_entity(game_ctx->active_scene, new_bullet(pos, tank->body->dir, 1, tank));
+        t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 20));
+
+		t_bullet_def def;
+		def.pos = pos;
+		def.dir = tank->body->dir;
+		def.damage = tank->damage;
+		def.velocity = tank->bullet_velocity;
+		def.owner = tank;
+
+        scene_add_entity(game_ctx->active_scene, new_bullet(def));
 
         tank->last_fire_time = get_time();
     }
@@ -293,6 +301,7 @@ static void init_tank(t_tank* tank, t_tank_def def)
 	tank->recharge_time = def.recharge_time;
 	tank->damage = def.damage;
 	tank->velocity = def.velocity;
+	tank->bullet_velocity = def.bullet_velocity;
 	tank->input = get_input(def.input_type);
 
 	t_physic_body_def body_def = {

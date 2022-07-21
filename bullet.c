@@ -17,15 +17,13 @@ typedef enum s_state {
 
 static void input(t_entity* entity, t_game_ctx* game_ctx)
 {
-    
+	(void)entity;
+	(void)game_ctx;
 }
 
 static void update(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_bullet* bullet = (t_bullet*)entity;
-    
-    t_vec2 dir = bullet->body->dir;
-    t_vec2 pos = bullet->body->body.a;
 
     switch (bullet->state) {
         case RUN: {
@@ -33,6 +31,8 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
 
             if (contact)
             {
+				t_entity* contacted_entity = bullet->body->contacted_body->user_data;
+
                 t_sprite sprite = {
                     .texture = get_texture(EFFECTS_TXR_ID),
                     .src = {32,0,16,16},
@@ -41,8 +41,8 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
                 bullet->anim = animation(sprite, 3, 300, 0);
                 bullet->state = EXPLOSION;
 
-				t_entity* contacted_entity = bullet->body->contacted_body->user_data;
-				entity_damage(contacted_entity, game_ctx, 100);
+
+				entity_damage(contacted_entity, game_ctx, bullet->damage);
             }
             break;
         }
@@ -86,7 +86,9 @@ static void bullet_free(t_entity* entity)
 
 static void bullet_damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 {
-
+	(void)entity;
+	(void)game_ctx;
+	(void)damage;
 }
 
 static t_entity_methods methods = {
@@ -98,45 +100,48 @@ static t_entity_methods methods = {
     .free = bullet_free
 };
 
-t_entity* new_bullet(t_vec2 pos, t_vec2 dir, float velocity, t_tank* owner)
+t_entity* new_bullet(t_bullet_def def)
 {
     t_bullet* bullet = calloc(1, sizeof(t_bullet));
 
-    t_physic_body_def def = {
-        .pos = pos,
+	bullet->methods = &methods;
+
+    t_physic_body_def body_def = {
+        .pos = def.pos,
         .size = vec2(4,4),
-        .dir = dir,
-        .velocity = velocity,
+        .dir = def.dir,
+        .velocity = def.velocity,
         .is_dynamic = 1,
         .layer = PHYSICS_LAYER_1
     };
-    t_physic_body* body = create_physic_body(def);
-    body->stop_on_contact = 0;
+    t_physic_body* body = create_physic_body(body_def);
+	body->stop_on_contact = 0;
 	body->user_data = bullet;
 
-    bullet->methods = &methods;
-    bullet->owner = owner;
-    bullet->body = body;
+	bullet->body = body;
+
+    bullet->owner = def.owner;
+	bullet->damage = def.damage;
     bullet->is_alive = 1;
 
     t_sprite sprite;
     sprite.texture = get_texture(BULLET_TXR_ID);
-    sprite.dest = (t_rect){pos.x, pos.y, 6, 6};
+    sprite.dest = (t_rect){def.pos.x, def.pos.y, 6, 6};
     sprite.src = (t_rect){0, 0, 4, 4};
     
-    if (dir.y == -1)
+    if (def.dir.y == -1)
     {
         sprite.src.x = 0;
     }
-    if (dir.y == 1)
+    if (def.dir.y == 1)
     {
         sprite.src.x = 8;
     }
-    if (dir.x == -1)
+    if (def.dir.x == -1)
     {
         sprite.src.x = 4;
     }
-    if (dir.x == 1)
+    if (def.dir.x == 1)
     {
         sprite.src.x = 12;
     }
