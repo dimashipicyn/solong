@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "libft.h"
 
-static t_settings settings = {};
+static t_settings settings;
 
 t_settings* get_settings()
 {

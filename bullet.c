@@ -31,14 +31,14 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
 
             if (contact)
             {
-				t_entity* contacted_entity = bullet->body->contacted_body->user_data;
+				t_entity* contacted_entity = bullet->body->contacted_body->owner;
 
                 t_sprite sprite = {
                     .texture = get_texture(EFFECTS_TXR_ID),
-                    .src = {32,0,16,16},
-                    .dest = {0,0,32,32}
+                    .src = {vec2(32,0),vec2(16,16)},
+                    .dest = {vec2(0,0),vec2(32,32)}
                 };
-                bullet->anim = animation(sprite, 3, 300, 0);
+                bullet->anim = animation(sprite, 3, 300, 0, 1);
                 bullet->state = EXPLOSION;
 
 
@@ -66,9 +66,7 @@ static void draw(t_entity* entity, t_game_ctx* game_ctx)
     update_animation(&bullet->anim, game_ctx->elapsed);
 
     t_sprite s = get_animation_sprite(&bullet->anim);
-    s.dest.x = bullet->body->body.a.x - s.dest.width / 2;
-    s.dest.y = bullet->body->body.a.y - s.dest.height / 2;
-
+	s.dest.pos = bullet->body->rect.pos;//vec2_sub(bullet->body->rect.pos, vec2(s.dest.size.x / 2, s.dest.size.y / 2));
     draw_sprite_to_frame(game_ctx->graphics, s);
 }
 
@@ -81,6 +79,7 @@ static int is_alive(t_entity* entity)
 static void bullet_free(t_entity* entity)
 {
     t_bullet* bullet = (t_bullet*)entity;
+
     free_bullet(bullet);
 }
 
@@ -108,7 +107,7 @@ t_entity* new_bullet(t_bullet_def def)
 
     t_physic_body_def body_def = {
         .pos = def.pos,
-        .size = vec2(4,4),
+        .size = vec2(2,2),
         .dir = def.dir,
         .velocity = def.velocity,
         .is_dynamic = 1,
@@ -116,7 +115,7 @@ t_entity* new_bullet(t_bullet_def def)
     };
     t_physic_body* body = create_physic_body(body_def);
 	body->stop_on_contact = 0;
-	body->user_data = bullet;
+	body->owner = bullet;
 
 	bullet->body = body;
 
@@ -126,24 +125,24 @@ t_entity* new_bullet(t_bullet_def def)
 
     t_sprite sprite;
     sprite.texture = get_texture(BULLET_TXR_ID);
-    sprite.dest = (t_rect){def.pos.x, def.pos.y, 6, 6};
-    sprite.src = (t_rect){0, 0, 4, 4};
+    sprite.dest = (t_rect){vec2(def.pos.x,def.pos.y), vec2(6,6)};
+    sprite.src = (t_rect){vec2(0,0), vec2(4,4)};
     
     if (def.dir.y == -1)
     {
-        sprite.src.x = 0;
+        sprite.src.pos.x = 0;
     }
     if (def.dir.y == 1)
     {
-        sprite.src.x = 8;
+        sprite.src.pos.x = 8;
     }
     if (def.dir.x == -1)
     {
-        sprite.src.x = 4;
+        sprite.src.pos.x = 4;
     }
     if (def.dir.x == 1)
     {
-        sprite.src.x = 12;
+        sprite.src.pos.x = 12;
     }
 
     bullet->anim = (t_animation) {

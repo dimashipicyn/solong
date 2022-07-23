@@ -168,8 +168,7 @@ void fire(t_tank* tank, t_game_ctx* game_ctx)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
     if (diff_time >= tank->recharge_time) {
-        t_vec2 bullet_pos = vec2(tank->body->body.a.x + 14, tank->body->body.a.y + 14);
-        t_vec2 pos = vec2_add(bullet_pos, vec2_scalar_num(tank->body->dir, 20));
+        t_vec2 pos = vec2_add(tank->body->rect.pos, vec2_scalar_num(tank->body->dir, 16));
 
 		t_bullet_def def;
 		def.pos = pos;
@@ -187,6 +186,10 @@ void fire(t_tank* tank, t_game_ctx* game_ctx)
 void input(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
+
+	if (tank->state == TANK_SPAWN_STATE) {
+		return;
+	}
     
     t_command cmd = tank->input(entity, game_ctx);
     command_execute(cmd, entity, game_ctx);
@@ -199,24 +202,25 @@ void update(t_entity* entity, t_game_ctx* game_ctx)
     
     t_vec2 dir = tank->body->dir;
     if (dir.y == -1) {
-        tank->anim[TANK_ANIMATION].sprite.src.x = 0;
+        tank->anim[TANK_ANIMATION].sprite.src.pos.x = 0;
     }
     else if (dir.y == 1) {
-        tank->anim[TANK_ANIMATION].sprite.src.x = 64;
+        tank->anim[TANK_ANIMATION].sprite.src.pos.x = 64;
     }
     else if (dir.x == -1) {
-        tank->anim[TANK_ANIMATION].sprite.src.x = 32;
+        tank->anim[TANK_ANIMATION].sprite.src.pos.x = 32;
     }
     if (dir.x == 1) {
-        tank->anim[TANK_ANIMATION].sprite.src.x = 96;
+        tank->anim[TANK_ANIMATION].sprite.src.pos.x = 96;
     }
 
     if (tank->body->velocity > 0.1) {
-        tank->anim[TANK_ANIMATION].nframes = 2;
+        play_animation(&tank->anim[TANK_ANIMATION]);
     }
-    else {
-        tank->anim[TANK_ANIMATION].nframes = 1;
-    }
+	else {
+		stop_animation(&tank->anim[TANK_ANIMATION]);
+	}
+
 	if (tank->anim[TANK_SPAWN_ANIMATION].is_end) {
 		tank->state = TANK_RUNNING_STATE;
 	}
@@ -231,11 +235,12 @@ void render(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
 
+	t_vec2 render_pos = vec2_sub(tank->body->rect.pos, vec2(16, 16));
+
 	if (tank->state == TANK_SPAWN_STATE) {
 		update_animation(&tank->anim[TANK_SPAWN_ANIMATION], game_ctx->elapsed);
 		t_sprite s = get_animation_sprite(&tank->anim[TANK_SPAWN_ANIMATION]);
-        s.dest.x = tank->body->body.a.x - 2;
-        s.dest.y = tank->body->body.a.y - 2;
+		s.dest.pos = render_pos;
 
         draw_sprite_to_frame(game_ctx->graphics, s);
 	}
@@ -244,8 +249,7 @@ void render(t_entity* entity, t_game_ctx* game_ctx)
 		update_animation(&tank->anim[i], game_ctx->elapsed);
 
         t_sprite s = get_animation_sprite(&tank->anim[i]);
-        s.dest.x = tank->body->body.a.x - 2;
-        s.dest.y = tank->body->body.a.y - 2;
+		s.dest.pos = render_pos;
         
         draw_sprite_to_frame(game_ctx->graphics, s);
     }
@@ -307,7 +311,7 @@ static void init_tank(t_tank* tank, t_tank_def def)
 	t_physic_body_def body_def = {
 		.pos = def.pos,
 		.dir = def.dir,
-		.size = vec2(28, 28),
+		.size = vec2(14, 14),
 		.layer = PHYSICS_LAYER_1 | PHYSICS_LAYER_2,
 		.is_dynamic = 1,
 		.user_data = tank
@@ -317,29 +321,29 @@ static void init_tank(t_tank* tank, t_tank_def def)
 
     tank->body = body;
 
-    t_vec2 pos = body->body.a;
+    t_vec2 pos = body->rect.pos;
     
     t_sprite tank_sprite = (t_sprite){
-        .dest = (t_rect){pos.x,pos.y,32,32},
-        .src = (t_rect){0,0,16,16},
+        .dest = (t_rect){vec2(pos.x,pos.y),vec2(32,32)},
+        .src = (t_rect){vec2(0,0),vec2(16,16)},
         .texture = get_texture(TANK_RED_TXR_ID)
     };
     
     t_sprite armor = (t_sprite){
-        .dest = (t_rect){pos.x,pos.y,32,32},
-        .src = (t_rect){0,0,16,16},
+        .dest = (t_rect){vec2(pos.x,pos.y),vec2(32,32)},
+        .src = (t_rect){vec2(0,0),vec2(16,16)},
         .texture = get_texture(EFFECTS_TXR_ID)
     };
 
 	t_sprite spawn = (t_sprite){
-        .dest = (t_rect){pos.x,pos.y,32,32},
-        .src = (t_rect){0,0,16,16},
+        .dest = (t_rect){vec2(pos.x,pos.y),vec2(32,32)},
+        .src = (t_rect){vec2(0,0),vec2(16,16)},
         .texture = get_texture(RESPAWN_TXR_ID)
     };
     
-    tank->anim[TANK_ANIMATION] = animation(tank_sprite, 1, 200, 1);
-    tank->anim[TANK_ARMOR_ANIMATION] = animation(armor, 2, 50, 1);
-	tank->anim[TANK_SPAWN_ANIMATION] = animation(spawn, 4, 1000, 0);
+    tank->anim[TANK_ANIMATION] = animation(tank_sprite, 1, 200, 1, 1);
+    tank->anim[TANK_ARMOR_ANIMATION] = animation(armor, 2, 50, 1, 1);
+	tank->anim[TANK_SPAWN_ANIMATION] = animation(spawn, 4, 1000, 0, 1);
     tank->active_animations = TANK_TOTAL_ANIMATIONS;
     
     tank->birth_date = get_time();

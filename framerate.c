@@ -11,8 +11,8 @@ void draw_number(t_graphics* graphics, t_point dest, int32_t number)
     t_texture *texture = get_texture(DIGITS_TXR_ID);
     int32_t w = texture->width / 10;
     int32_t h = texture->height;
-    t_rect dst = {dest.x,dest.y,16,20};
-    t_rect src = {0,0,w,h};
+    t_rect dst = {vec2(dest.x,dest.y),vec2(16,20)};
+    t_rect src = {vec2(0,0),vec2(w,h)};
     t_sprite sprite = {
         .dest = dst,
         .src = src,
@@ -24,9 +24,9 @@ void draw_number(t_graphics* graphics, t_point dest, int32_t number)
     int32_t i = 0;
     while (snum[i]) {
         int32_t idx = snum[i] - '0';
-        sprite.src.x = idx * w;
+        sprite.src.pos.x = idx * w;
         draw_sprite_to_frame(graphics, sprite);
-        sprite.dest.x += (sprite.dest.width + 1);
+        sprite.dest.pos.x += (sprite.dest.size.x + 1);
         ++i;
     }
     free(snum);

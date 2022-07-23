@@ -15,21 +15,21 @@ enum {
 
 typedef struct s_body_rect
 {
-    t_vec2 a;
-    t_vec2 b;
+    t_vec2 pos;
+    t_vec2 half_size;
 } t_body_rect;
 
 typedef struct s_physic_body t_physic_body;
 typedef struct s_physic_body
 {
-    void*           user_data;
+    void*           owner;
     t_physic_body*  contacted_body;
+	t_body_rect     rect;
+	int32_t         layer;
     t_vec2          dir;
     float           velocity;
-    t_body_rect     body;
-    int32_t         layer;
-    char            stop_on_contact;
-    char            contact;
+    int8_t          stop_on_contact;
+    int8_t          contact;
 } t_physic_body;
 
 typedef struct s_physic_body_def

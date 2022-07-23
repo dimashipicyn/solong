@@ -20,10 +20,8 @@ typedef struct s_line {
 } t_line;
 
 typedef struct s_rect {
-    int x;
-    int y;
-    int width;
-    int height;
+	t_vec2 pos;
+	t_vec2 size;
 } t_rect;
 
 typedef struct s_circle {

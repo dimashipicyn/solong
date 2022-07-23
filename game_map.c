@@ -80,13 +80,13 @@ t_game_map* new_game_map(char* filename)
         return NULL;
     }
 
-    sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID), {0,0,16,16}, {0,0,16,16}};
-    sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {0,0,8,8}};
-    sprites[CONCRETE]	= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {8,0,8,8}};
-    sprites[FOREST]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {16,0,8,8}};
-    sprites[ICE]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {24,0,8,8}};
-    sprites[WATER]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {0,0,16,16}, {32,0,8,8}};
-    sprites[BASE_OREL]	= (t_sprite){get_texture(OREL_TXR_ID), {0,0,32,32}, {0,0,16,16}};
+    sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID),    {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(16,16)}};
+    sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(8,8)}};
+    sprites[CONCRETE]	= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(8,0),vec2(8,8)}};
+    sprites[FOREST]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(16,0),vec2(8,8)}};
+    sprites[ICE]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(24,0),vec2(8,8)}};
+    sprites[WATER]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(32,0),vec2(8,8)}};
+    sprites[BASE_OREL]	= (t_sprite){get_texture(OREL_TXR_ID),    {vec2(0,0),vec2(32,32)}, {vec2(0,0),vec2(16,16)}};
     
     return map;
 }
@@ -137,8 +137,8 @@ void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
     if (type == BRICK || type == WATER || type == CONCRETE)
     {
         t_physic_body_def def = {
-            .pos = vec2(x * 16, y * 16),
-            .size = vec2(16, 16),
+            .pos = vec2(x * 16 + 8, y * 16 + 8),
+            .size = vec2(8, 8),
             .user_data = terrain,
             .layer = get_physics_layer_from_type(type)
         };
@@ -243,13 +243,13 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
             t_terrain terrain = tiles[row * game_map->width + col];
             
             t_sprite sprite_empty = sprites[EMPTY];
-            sprite_empty.dest.x = col * sprite_empty.dest.width;
-            sprite_empty.dest.y = row * sprite_empty.dest.height;
+            sprite_empty.dest.pos.x = col * sprite_empty.dest.size.x;
+            sprite_empty.dest.pos.y = row * sprite_empty.dest.size.y;
             draw_sprite_to_frame(graphics, sprite_empty);
             
             t_sprite sprite = sprites[terrain.type];
-            sprite.dest.x = col * 16;
-            sprite.dest.y = row * 16;
+            sprite.dest.pos.x = col * 16;
+            sprite.dest.pos.y = row * 16;
             
             if (terrain.type == BASE_OREL) {
                 orel = sprite;

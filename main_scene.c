@@ -49,7 +49,7 @@ t_tank* tank_factory(t_main_scene* scene)
 	def.input_type = ENEMY_INPUT_TYPE;
 	def.damage = 100;
 	def.hitpoints = 100;
-	def.recharge_time = 1000;
+	def.recharge_time = 300;
 	def.velocity = 1;
 	def.bullet_velocity = 3;
 
@@ -118,7 +118,7 @@ void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 
 	ft_list_push_back(&scene->entities, player_one);
 	ft_list_push_back(&scene->entities, player_two);
-    ft_list_push_back(&scene->entities, tank_factory(scene));
+    //ft_list_push_back(&scene->entities, tank_factory(scene));
 }
 
 static int entity_cmp(void* t, void* p)

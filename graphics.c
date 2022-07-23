@@ -8,7 +8,7 @@
 
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
 {
-    register int *color = (texture->addr + (x * texture->bits_per_pixel)
+    register int *color = (int*)((uint8_t*)texture->addr + (x * texture->bits_per_pixel)
                                      + (y * texture->width * texture->bits_per_pixel)
                                      );
     return *color;
@@ -16,70 +16,44 @@ static inline int get_pixel_texture(t_texture* texture, int x, int y)
 
 static inline void set_pixel_texture(t_texture *texture, int x, int y, int color)
 {
-    *(int *)(texture->addr + (x * 4)
+    *(int *)((uint8_t*)texture->addr + (x * 4)
                            + (y * texture->width * 4)
                            ) = color;
-}
-
-void draw_line_to_frame(t_graphics* grapics, t_line line)
-{
-    int dx = fabs(line.a.x - line.b.x);
-    int dy = fabs(line.a.y - line.b.y);
-    int y = line.a.y;
-    int e = -2 * dx;
-    for(int x = line.a.x ; x <= line.b.x ; ++x) {
-        set_pixel_texture(grapics->frame, x, y, 0x0089ff89);
-        e += 2 * dy;
-        if(e > 0) ++y;
-        if(e >= dx) e -= 2 * dx;
-    }    
-}
-
-void        draw_rect_to_frame(t_graphics* grapics, t_rect rect)
-{
-
-}
-
-void        draw_circle_to_frame(t_graphics* grapics, t_circle circle)
-{
-
-}
-
-void        draw_triangle_to_frame(t_graphics* grapics, t_triangle triangle)
-{
-    
 }
 
 void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 {
     t_texture* frame = graphics->frame;
 
-    int x_max = (sprite.dest.x + sprite.dest.width) < frame->width ? sprite.dest.width : frame->width - sprite.dest.x;
-    int y_max = (sprite.dest.y + sprite.dest.height) < frame->height ? sprite.dest.height : frame->height - sprite.dest.y;
+	t_rect dest = sprite.dest;
+	t_rect src = sprite.src;
 
-    int x_min = sprite.dest.x >= 0 ? 0 : -sprite.dest.x;
-    int y_min = sprite.dest.y >= 0 ? 0 : -sprite.dest.y;
+    int x_max = (dest.pos.x + dest.size.x) < frame->width ? dest.size.x : frame->width - dest.pos.x;
+    int y_max = (dest.pos.y + dest.size.y) < frame->height ? dest.size.y : frame->height - dest.size.y;
+
+    int x_min = dest.pos.x >= 0 ? 0 : -dest.pos.x;
+    int y_min = dest.pos.y >= 0 ? 0 : -dest.pos.y;
     
     if (x_min < 0 || y_min < 0 || x_max < 0 || y_max < 0) {
         return;
     }
 
-    float scale_x = sprite.src.width / (float)sprite.dest.width;
-    float scale_y = sprite.src.height / (float)sprite.dest.height;
+    float scale_x = src.size.x / dest.size.x;
+    float scale_y = src.size.y / dest.size.y;
 
     for (int y = y_min; y < y_max; ++y) {
 
         for (int x = x_min; x < x_max; ++x) {
 
             // получаем нужный пиксель с учетом масштаба
-            int color = get_pixel_texture(sprite.texture, sprite.src.x + x * scale_x, sprite.src.y + y * scale_y);
+            int color = get_pixel_texture(sprite.texture, src.pos.x + x * scale_x, src.pos.y + y * scale_y);
 
             // черный цвет пропускаем
             if (/* color == 0x00FFFFFF || */ color == 0x00000001) {
                 continue;
             }
             
-            set_pixel_texture(frame, x + sprite.dest.x, y + sprite.dest.y, color);
+            set_pixel_texture(frame, x + dest.pos.x, y + dest.pos.y, color);
         }
     }
 }
