@@ -168,7 +168,7 @@ void fire(t_tank* tank, t_game_ctx* game_ctx)
 {
     int64_t diff_time = get_time() - tank->last_fire_time;
     if (diff_time >= tank->recharge_time) {
-        t_vec2 pos = vec2_add(tank->body->rect.pos, vec2_scalar_num(tank->body->dir, 16));
+        t_vec2 pos = vec2_add(tank->body->rect.pos, vec2_scalar_num(tank->body->dir, 18));
 
 		t_bullet_def def;
 		def.pos = pos;
@@ -224,7 +224,7 @@ void update(t_entity* entity, t_game_ctx* game_ctx)
 	if (tank->anim[TANK_SPAWN_ANIMATION].is_end) {
 		tank->state = TANK_RUNNING_STATE;
 	}
-    if ((get_time() - tank->birth_date) >= 10000)
+    if ((get_time() - tank->birth_date) >= 5000)
     {
         tank->armor = 0;
         tank->active_animations = 2;
@@ -235,7 +235,7 @@ void render(t_entity* entity, t_game_ctx* game_ctx)
 {
     t_tank* tank = (t_tank*)entity;
 
-	t_vec2 render_pos = vec2_sub(tank->body->rect.pos, vec2(16, 16));
+	t_vec2 render_pos = vec2_sub(tank->body->rect.pos, vec2(15, 15));
 
 	if (tank->state == TANK_SPAWN_STATE) {
 		update_animation(&tank->anim[TANK_SPAWN_ANIMATION], game_ctx->elapsed);
@@ -341,7 +341,7 @@ static void init_tank(t_tank* tank, t_tank_def def)
         .texture = get_texture(RESPAWN_TXR_ID)
     };
     
-    tank->anim[TANK_ANIMATION] = animation(tank_sprite, 1, 200, 1, 1);
+    tank->anim[TANK_ANIMATION] = animation(tank_sprite, 2, 200, 1, 1);
     tank->anim[TANK_ARMOR_ANIMATION] = animation(armor, 2, 50, 1, 1);
 	tank->anim[TANK_SPAWN_ANIMATION] = animation(spawn, 4, 1000, 0, 1);
     tank->active_animations = TANK_TOTAL_ANIMATIONS;

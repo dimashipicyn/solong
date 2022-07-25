@@ -66,7 +66,7 @@ static void draw(t_entity* entity, t_game_ctx* game_ctx)
     update_animation(&bullet->anim, game_ctx->elapsed);
 
     t_sprite s = get_animation_sprite(&bullet->anim);
-	s.dest.pos = bullet->body->rect.pos;//vec2_sub(bullet->body->rect.pos, vec2(s.dest.size.x / 2, s.dest.size.y / 2));
+	s.dest.pos = vec2_sub(bullet->body->rect.pos, vec2(s.dest.size.x / 2, s.dest.size.y / 2));
     draw_sprite_to_frame(game_ctx->graphics, s);
 }
 
@@ -125,7 +125,7 @@ t_entity* new_bullet(t_bullet_def def)
 
     t_sprite sprite;
     sprite.texture = get_texture(BULLET_TXR_ID);
-    sprite.dest = (t_rect){vec2(def.pos.x,def.pos.y), vec2(6,6)};
+    sprite.dest = (t_rect){def.pos, vec2(6,6)};
     sprite.src = (t_rect){vec2(0,0), vec2(4,4)};
     
     if (def.dir.y == -1)

@@ -21,6 +21,7 @@ set(SOURCE_FILES
     scene.c
     main_scene.c
 	command.c
+	menu_scene.c
 )
 
 set(HEADER_FILES 
@@ -41,6 +42,7 @@ set(HEADER_FILES
     scene.h
     main_scene.h
 	command.h
+	menu_scene.h
 )
 
 add_executable(solong 

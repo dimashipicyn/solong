@@ -8,6 +8,7 @@
 #include "game_map.h"
 #include "settings.h"
 #include "main_scene.h"
+#include "menu_scene.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -99,13 +100,14 @@ t_game_ctx* init_game(char** env)
     }
 
 	game->scenes[MAIN_SCENE] = new_main_scene();
+	game->scenes[MENU_SCENE] = new_menu_scene();
 
 	for (int i = 0; i < TOTAL_SCENES; i++) {
 		scene_preload(game->scenes[i], game);
 		scene_create(game->scenes[i], game);
 	}
 
-	game->active_scene = game->scenes[MAIN_SCENE];
+	game->active_scene = game->scenes[MENU_SCENE];
     game->graphics = graphics;
 	
     return game;
@@ -113,7 +115,6 @@ t_game_ctx* init_game(char** env)
 error:
     free(game);
     free(graphics);
-    free(map);
 
     return NULL;
 }

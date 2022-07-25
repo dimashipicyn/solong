@@ -11,6 +11,7 @@ typedef struct s_graphics t_graphics;
 typedef struct s_keys t_keys;
 
 typedef enum e_scene_type {
+	MENU_SCENE,
     MAIN_SCENE,
     TOTAL_SCENES
 } t_scene_type;
