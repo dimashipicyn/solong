@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <SDL.h>
 
 static const int32_t tick_time = 1000 / 60;
 
@@ -30,10 +31,9 @@ int loop_callback(void* data)
         step_physic_world();
         game_ctx->lag -= tick_time;
     }
-    
-    scene_render(game_ctx->active_scene, game_ctx);
-    //draw_framerate(game->graphics, elapsed);
 
+    scene_render(game_ctx->active_scene, game_ctx);
+    draw_framerate(graphics, game_ctx->elapsed);
     render_frame(graphics);
 
     return 0;
@@ -46,11 +46,29 @@ int close_game() {
 void loop(t_game_ctx* game)
 {
     game->previous_time = get_time();
-    mlx_hook(game->graphics->window, 2, 1L << 0, key_init, &game->keys);
-    mlx_hook(game->graphics->window, 3, 1L << 1, key_destroy, &game->keys);
-    mlx_hook(game->graphics->window, 17, 0, close_game, game);
-    mlx_loop_hook(game->graphics->mlx, &loop_callback, game);
-    mlx_loop(game->graphics->mlx);
+	SDL_Event event;
+	int quit = 0;
+    while (!quit)
+    {
+        SDL_PollEvent(&event);
+
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                quit = 1;
+                break;
+        }
+		//clear_frame(game->graphics);
+		SDL_RenderClear(game->graphics->renderer);
+
+		//t_texture* tx = get_texture(TANK_RED_TXR_ID);
+
+		//SDL_RenderCopy(game->graphics->renderer, tx->texture, NULL, NULL);
+
+		//render_frame(game->graphics);
+		loop_callback(game);
+		//SDL_Delay(100);
+    }
 }
 
 char* get_current_dir(char** env)
@@ -70,7 +88,6 @@ t_game_ctx* init_game(char** env)
 {
     t_game_ctx* game = NULL;
     t_graphics* graphics = NULL;
-    t_game_map* map = NULL;
 
     game = calloc(1, sizeof(t_game_ctx));
     if (!game) {
@@ -107,7 +124,7 @@ t_game_ctx* init_game(char** env)
 		scene_create(game->scenes[i], game);
 	}
 
-	game->active_scene = game->scenes[MENU_SCENE];
+	game->active_scene = game->scenes[MAIN_SCENE];
     game->graphics = graphics;
 	
     return game;

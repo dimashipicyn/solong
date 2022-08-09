@@ -6,12 +6,13 @@
 #include <stdint.h>
 
 typedef struct s_texture t_texture;
+typedef struct SDL_Window SDL_Window;
+typedef struct SDL_Renderer SDL_Renderer;
+typedef struct SDL_Texture SDL_Texture;
 
 typedef struct s_graphics {
-    void* mlx;
-    void* window;
-
-    t_texture *frame;
+    SDL_Window*		window;
+	SDL_Renderer*	renderer;
 } t_graphics;
 
 typedef struct s_line {
@@ -46,6 +47,7 @@ typedef struct s_game_ctx t_game_ctx;
 t_graphics*	init_graphics(int width, int height, char* title);
 void		draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite);
 void		render_frame(t_graphics* graphics);
+void		clear_frame(t_graphics* graphics);
 void        draw_line_to_frame(t_graphics* grapics, t_line line);
 void        draw_rect_to_frame(t_graphics* grapics, t_rect rect);
 void        draw_circle_to_frame(t_graphics* grapics, t_circle circle);

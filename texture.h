@@ -17,15 +17,10 @@ typedef enum texture_id {
     TOTAL_TEXTURES
 } t_texture_id;
 
-typedef struct s_texture {
-    void* image;
-    void* addr;
+typedef struct SDL_Texture SDL_Texture;
 
-    int width;
-    int height;
-    int bits_per_pixel;
-	int endian;
-	int line_len;
+typedef struct s_texture {
+	SDL_Texture* texture;
 } t_texture;
 
 typedef struct s_graphics t_graphics;

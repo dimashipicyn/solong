@@ -5,7 +5,9 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <SDL.h>
 
+#if 0
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
 {
     register int *color = (int*)((uint8_t*)texture->addr + (x * texture->bits_per_pixel)
@@ -116,4 +118,53 @@ t_graphics *init_graphics(int width, int height, char* title)
     };
 
     return graphics;
+}
+
+#endif
+
+t_graphics *init_graphics(int width, int height, char* title)
+{
+    SDL_Window*		window = NULL;
+	SDL_Renderer*	renderer = NULL;
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        return NULL;
+    }
+
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    if (!window) {
+        return NULL;
+    }
+
+	renderer = SDL_CreateRenderer(window, -1, 0);
+	if (!renderer) {
+		SDL_DestroyWindow(window);
+		return NULL;
+	}
+
+    t_graphics  *graphics = calloc(1, sizeof(t_graphics));
+
+    *graphics = (t_graphics) {
+        .window = window,
+		.renderer = renderer,
+    };
+
+    return graphics;
+}
+
+void render_frame(t_graphics* graphics)
+{
+	SDL_RenderPresent(graphics->renderer);
+}
+
+void clear_frame(t_graphics* graphics)
+{
+	SDL_RenderClear(graphics->renderer);
+}
+
+void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
+{
+	SDL_Rect src = {sprite.src.pos.x, sprite.src.pos.y, sprite.src.size.x, sprite.src.size.y};
+	SDL_Rect dest = {sprite.dest.pos.x, sprite.dest.pos.y, sprite.dest.size.x, sprite.dest.size.y};
+	SDL_RenderCopy(graphics->renderer, sprite.texture->texture, &src, &dest);
 }
