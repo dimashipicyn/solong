@@ -17,13 +17,13 @@ typedef enum e_scene_type {
 } t_scene_type;
 
 typedef struct s_game_ctx {
-    t_graphics  *graphics;
-    t_scene     *scenes[TOTAL_SCENES];
-    t_scene     *active_scene;
-    t_keys      keys;
-	int64_t		lag;
-	int64_t		previous_time;
-    int64_t     elapsed;
+    t_graphics  	*graphics;
+    t_scene     	*scenes[TOTAL_SCENES];
+    t_scene     	*active_scene;
+    const uint8_t	*keys;
+	int64_t			lag;
+	int64_t			previous_time;
+    int64_t     	elapsed;
 } t_game_ctx;
 
 #endif

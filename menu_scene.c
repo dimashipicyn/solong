@@ -12,6 +12,7 @@
 #include "game_map.h"
 
 #include <stdlib.h>
+#include <SDL.h>
 
 typedef struct s_menu_scene
 {
@@ -53,7 +54,7 @@ void menu_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
 
-	scene->map = new_game_map("menu.ber");
+	//scene->map = new_game_map("menu.ber");
 }
 
 void menu_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
@@ -63,7 +64,7 @@ void menu_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 	t_sprite s;
 	s.texture = get_texture(TANK_YELLOW_TXR_ID);
 	s.src = (t_rect){vec2(96, 0), vec2(16, 16)};
-	s.dest = (t_rect){get_player_one_spawn_pos(scene->map), vec2(32, 32)};
+	//s.dest = (t_rect){get_player_one_spawn_pos(scene->map), vec2(32, 32)};
 
 	scene->cursor = animation(s, 2, 200, 1, 1);
 }
@@ -74,7 +75,7 @@ void menu_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 
 	update_animation(&scene->cursor, game_ctx->elapsed);
 
-	if (game_ctx->keys.pressed[K_CODE_ENTER]) {
+	if (game_ctx->keys[SDL_SCANCODE_KP_ENTER]) {
 		game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
 	}
 }

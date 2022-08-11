@@ -136,7 +136,7 @@ t_graphics *init_graphics(int width, int height, char* title)
         return NULL;
     }
 
-	renderer = SDL_CreateRenderer(window, -1, 0);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer) {
 		SDL_DestroyWindow(window);
 		return NULL;

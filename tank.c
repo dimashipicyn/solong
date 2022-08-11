@@ -9,6 +9,7 @@
 #include "command.h"
 
 #include <assert.h>
+#include <SDL.h>
 
 enum tank_state {
 	TANK_SPAWN_STATE,
@@ -88,20 +89,20 @@ static t_command player_one_input(t_entity* entity, t_game_ctx* game_ctx)
 {
 	(void)entity;
 
-    t_keys keys = game_ctx->keys;
-    if (keys.pressed[K_CODE_W]) {
+    const uint8_t* keys = game_ctx->keys;
+    if (keys[SDL_SCANCODE_W]) {
         return command(move_forw_command);
     }
-    else if (keys.pressed[K_CODE_S]) {
+    else if (keys[SDL_SCANCODE_S]) {
         return command(move_back_command);
     }
-    else if (keys.pressed[K_CODE_A]) {
+    else if (keys[SDL_SCANCODE_A]) {
         return command(move_left_command);
     }
-    else if (keys.pressed[K_CODE_D]) {
+    else if (keys[SDL_SCANCODE_D]) {
         return command(move_right_command);
     }
-	else if (keys.pressed[K_CODE_F]) {
+	else if (keys[SDL_SCANCODE_F]) {
         return command(fire_command);
     }
     return command(stop_command);
@@ -111,20 +112,20 @@ static t_command player_two_input(t_entity* entity, t_game_ctx* game_ctx)
 {
 	(void)entity;
 
-    t_keys keys = game_ctx->keys;
-    if (keys.pressed[K_CODE_TOP]) {
+    const uint8_t* keys = game_ctx->keys;
+    if (keys[SDL_SCANCODE_UP]) {
         return command(move_forw_command);
     }
-    else if (keys.pressed[K_CODE_BOTTOM]) {
+    else if (keys[SDL_SCANCODE_DOWN]) {
         return command(move_back_command);
     }
-    else if (keys.pressed[K_CODE_LEFT]) {
+    else if (keys[SDL_SCANCODE_LEFT]) {
         return command(move_left_command);
     }
-    else if (keys.pressed[K_CODE_RIGHT]) {
+    else if (keys[SDL_SCANCODE_RIGHT]) {
         return command(move_right_command);
     }
-	else if (keys.pressed[K_CODE_ENTER]) {
+	else if (keys[SDL_SCANCODE_RSHIFT]) {
         return command(fire_command);
     }
     return command(stop_command);
@@ -342,7 +343,7 @@ static void init_tank(t_tank* tank, t_tank_def def)
     };
     
     tank->anim[TANK_ANIMATION] = animation(tank_sprite, 2, 200, 1, 1);
-    tank->anim[TANK_ARMOR_ANIMATION] = animation(armor, 2, 50, 1, 1);
+    tank->anim[TANK_ARMOR_ANIMATION] = animation(armor, 2, 100, 1, 1);
 	tank->anim[TANK_SPAWN_ANIMATION] = animation(spawn, 4, 1000, 0, 1);
     tank->active_animations = TANK_TOTAL_ANIMATIONS;
     

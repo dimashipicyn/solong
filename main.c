@@ -26,14 +26,14 @@ int loop_callback(void* data)
     game_ctx->previous_time = start;
     game_ctx->lag += game_ctx->elapsed;
 
-    while (game_ctx->lag > tick_time) {
+    while (game_ctx->lag >= tick_time) {
         scene_update(game_ctx->active_scene, game_ctx);
         step_physic_world();
         game_ctx->lag -= tick_time;
     }
 
     scene_render(game_ctx->active_scene, game_ctx);
-    draw_framerate(graphics, game_ctx->elapsed);
+    //draw_framerate(graphics, game_ctx->elapsed);
     render_frame(graphics);
 
     return 0;
@@ -58,16 +58,9 @@ void loop(t_game_ctx* game)
                 quit = 1;
                 break;
         }
-		//clear_frame(game->graphics);
-		SDL_RenderClear(game->graphics->renderer);
+		game->keys = SDL_GetKeyboardState(NULL);
 
-		//t_texture* tx = get_texture(TANK_RED_TXR_ID);
-
-		//SDL_RenderCopy(game->graphics->renderer, tx->texture, NULL, NULL);
-
-		//render_frame(game->graphics);
 		loop_callback(game);
-		//SDL_Delay(100);
     }
 }
 

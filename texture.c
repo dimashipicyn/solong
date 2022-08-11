@@ -52,20 +52,17 @@ int load_textures(t_graphics* ctx, char* path_to_cur_dir)
 		ft_memset(filename, 0, MAX_SIZE_PATH);
 		ft_strlcat(filename, path_to_cur_dir, MAX_SIZE_PATH);
 		ft_strlcat(filename, texture_filenames[txr_id], MAX_SIZE_PATH);
-		
-		t_texture texture = {NULL, NULL, 0, 0, 0, 0, 0};
-		
-		//if (ft_strcmp(".xpm", ft_strrchr(filename, '.')) == 0) {
-		//	texture.image = mlx_xpm_file_to_image(ctx->mlx, filename, &texture.width, &texture.height);
-		//}
 
 		SDL_Surface* image = IMG_Load(filename);
-		texture.texture = SDL_CreateTextureFromSurface(ctx->renderer, image);
-		
-		if (texture.texture == NULL) {
+		if (image == NULL) {
 			ft_printf("Could not load texture: %s\n", filename);
 			goto error;
 		}
+		SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 0, 0, 0x01));
+
+		t_texture texture;
+		texture.texture = SDL_CreateTextureFromSurface(ctx->renderer, image);
+		SDL_FreeSurface(image);
 		
 		textures[txr_id] = texture;
 		txr_id++;
