@@ -41,10 +41,10 @@ t_physic_world* new_physic_world()
 
 void free_physic_world(t_physic_world* w)
 {
-    ft_list_foreach(w->static_bodies, free_physic_body);
-    ft_list_foreach(w->dynamic_bodies, free_physic_body);
-    ft_list_clear(&w->static_bodies);
-    ft_list_clear(&w->dynamic_bodies);
+    ut_list_foreach(w->static_bodies, free_physic_body);
+    ut_list_foreach(w->dynamic_bodies, free_physic_body);
+    ut_list_clear(&w->static_bodies);
+    ut_list_clear(&w->dynamic_bodies);
     free(w);
 }
 
@@ -119,10 +119,10 @@ t_physic_body* create_physic_body(t_physic_body_def def)
     b->layer = def.layer;
 
     if (def.is_dynamic) {
-        ft_list_push_back(&physic_world.dynamic_bodies, b);
+        ut_list_push_back(&physic_world.dynamic_bodies, b);
     }
     else {
-        ft_list_push_back(&physic_world.static_bodies, b);
+        ut_list_push_back(&physic_world.static_bodies, b);
     }
 
     return b;
@@ -130,7 +130,7 @@ t_physic_body* create_physic_body(t_physic_body_def def)
 
 void free_physic_body(t_physic_body* b)
 {
-    ft_list_remove_if(&physic_world.static_bodies, b, cmp);
-    ft_list_remove_if(&physic_world.dynamic_bodies, b, cmp);
+    ut_list_remove_if(&physic_world.static_bodies, b, cmp);
+    ut_list_remove_if(&physic_world.dynamic_bodies, b, cmp);
     free(b);
 }

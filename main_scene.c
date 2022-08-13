@@ -12,7 +12,7 @@
 #include "physics.h"
 #include "tank.h"
 
-#include "libft.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <assert.h>
 

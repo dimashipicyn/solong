@@ -1,7 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include "libft.h"
+#include "utils.h"
 #include "vector.h"
 
 enum {

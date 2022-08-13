@@ -2,9 +2,9 @@
 #include "graphics.h"
 #include "vector.h"
 #include "texture.h"
-#include "libft.h"
+#include "utils.h"
 
-#include <stdint.h>
+#include <stdlib.h>
 
 void draw_number(t_graphics* graphics, t_point dest, int32_t number)
 {
@@ -19,7 +19,8 @@ void draw_number(t_graphics* graphics, t_point dest, int32_t number)
         .texture = texture
     };
 
-    char* snum = ft_itoa(number);
+	char snum[100];
+    ut_itoa_base(snum, number, 10);
 
     int32_t i = 0;
     while (snum[i]) {

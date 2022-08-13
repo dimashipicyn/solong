@@ -8,7 +8,7 @@
 #ifndef scene_h
 #define scene_h
 
-#include "libft.h"
+#include "utils.h"
 
 typedef struct s_game_ctx t_game_ctx;
 typedef struct s_scene t_scene;

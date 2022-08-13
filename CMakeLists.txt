@@ -33,7 +33,6 @@ set(SOURCE_FILES
     settings.c
     tank.c
     texture.c
-    utils.c
     entity.c
     framerate.c
     game_map.c
@@ -53,7 +52,6 @@ set(HEADER_FILES
     settings.h
     tank.h
     texture.h
-    utils.h
     entity.h
     framerate.h
     game_map.h
@@ -73,34 +71,6 @@ add_executable(solong
     ${HEADER_FILES}
 )
 
-#MLX
-#set(MLX_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/lmlx/libmlx.a)
-#add_custom_target(build_mlx ALL 
-#                   COMMAND ${CMAKE_MAKE_PROGRAM}
-#                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lmlx
-#                   COMMENT "Original mlx makefile target")
-#
-#add_library(mlx STATIC IMPORTED)
-#set_property(TARGET mlx APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
-#set_target_properties(mlx PROPERTIES
-#  IMPORTED_LOCATION_NOCONFIG "${MLX_LIBRARY}")
-#
-#add_dependencies(mlx build_mlx)
-
-#LIBFT
-#set(FT_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/lft/libft.a)
-#add_custom_target(build_ft ALL 
-#                   COMMAND ${CMAKE_MAKE_PROGRAM}
-#                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lft
-#                   COMMENT "Original ft makefile target")
-#
-#add_library(ft STATIC IMPORTED)
-#set_property(TARGET ft APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
-#set_target_properties(ft PROPERTIES
-#  IMPORTED_LOCATION_NOCONFIG "${FT_LIBRARY}")
-
-#add_dependencies(ft build_ft)
-
 
 find_library(APPKIT Appkit)
 if (NOT APPKIT)
@@ -112,15 +82,13 @@ if (NOT OPENGL)
     message(FATAL_ERROR "OpenGL not found")
 endif()
 
-add_subdirectory(ft)
-add_subdirectory(mlx)
+add_subdirectory(utils)
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	mlx
-    ft
+    utils
     "-framework Appkit"
     "-framework OpenGL"
 	SDL2::SDL2
@@ -130,9 +98,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-	"${PROJECT_BINARY_DIR}"
-    "${PROJECT_SOURCE_DIR}/mlx"
-    "${PROJECT_SOURCE_DIR}/ft"
+	"${PROJECT_SOURCE_DIR}"
+    "${PROJECT_SOURCE_DIR}/utils"
 	${SDL2_INCLUDE_DIRS}
 	${SDL2IMAGE_INCLUDE_DIRS}
 )

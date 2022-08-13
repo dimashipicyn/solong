@@ -1,5 +1,5 @@
 #include "entity.h"
-#include "libft.h"
+#include "utils.h"
 #include <assert.h>
 
 void entity_input(t_entity* entity, t_game_ctx* game_ctx)

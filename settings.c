@@ -1,7 +1,12 @@
 #include <fcntl.h>
 
 #include "settings.h"
-#include "libft.h"
+#include "utils.h"
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static t_settings settings;
 
@@ -19,26 +24,26 @@ static char* setting_name[] = {
 
 static int parse_line(char* line)
 {
-	char* found_delim = ft_strchr(line, ':');
+	char* found_delim = strchr(line, ':');
 	if (found_delim == NULL) {
-		ft_printf("Parse settings error! ':' not found. Line: %s\n", line);
+		printf("Parse settings error! ':' not found. Line: %s\n", line);
 		goto error;
 	}
 	*found_delim = '\0';
 
 	char* name = line;
 	char* value = found_delim + 1;
-	if (!ft_strcmp(setting_name[0], name)) {
-		settings.resolution_w = ft_atoi(value);
+	if (!strcmp(setting_name[0], name)) {
+		settings.resolution_w = atoi(value);
 	}
-	else if (!ft_strcmp(setting_name[1], name)) {
-		settings.resolution_h = ft_atoi(value);
+	else if (!strcmp(setting_name[1], name)) {
+		settings.resolution_h = atoi(value);
 	}
-	else if (!ft_strcmp(setting_name[2], name)) {
-		settings.game_name = ft_strdup(value);
+	else if (!strcmp(setting_name[2], name)) {
+		settings.game_name = strdup(value);
 	}
 	else {
-		ft_printf("Unrecognized option: %s\n", name);
+		printf("Unrecognized option: %s\n", name);
 		goto error;
 	}
 
@@ -54,7 +59,7 @@ int load_settings(char* filename)
 
 	int fd = open(filename, O_RDONLY);
 	if (fd == -1) {
-		ft_printf("Dont open settings: %s!\n", filename);
+		printf("Dont open settings: %s!\n", filename);
 		goto error;
 	}
 	

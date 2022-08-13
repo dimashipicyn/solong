@@ -6,8 +6,9 @@
 //
 
 #include "scene.h"
-
 #include "entity.h"
+
+#include <stdlib.h>
 
 void scene_init(t_scene* scene)
 {
@@ -49,7 +50,7 @@ void scene_update(t_scene* scene, t_game_ctx* game_ctx)
         if (!entity_is_alive(entity)) {
             it = it->next;
 			entity_free(entity);
-            ft_list_remove_if(&scene->entities, entity, entity_cmp);
+            ut_list_remove_if(&scene->entities, entity, entity_cmp);
         }
         else {
             it = it->next;
@@ -57,9 +58,9 @@ void scene_update(t_scene* scene, t_game_ctx* game_ctx)
     }
 
     for (t_list* it = scene->added_entities; it != NULL; it = it->next) {
-        ft_list_push_back(&scene->entities, it->content);
+        ut_list_push_back(&scene->entities, it->content);
     }
-    ft_list_clear(&scene->added_entities);
+    ut_list_clear(&scene->added_entities);
 	
     scene->methods->update(scene, game_ctx);
 }
@@ -74,7 +75,7 @@ void scene_render(t_scene* scene, t_game_ctx* game_ctx)
 
 void scene_add_entity(t_scene* scene, t_entity* entity)
 {
-	ft_list_push_back(&scene->added_entities, entity);
+	ut_list_push_back(&scene->added_entities, entity);
 }
 
 void scene_free(t_scene* scene)
@@ -82,8 +83,8 @@ void scene_free(t_scene* scene)
 	for (t_list* it = scene->entities; it != NULL; it = it->next) {
 		entity_free(it->content);
 	}
-	ft_list_clear(&scene->entities);
-	ft_list_clear(&scene->added_entities);
+	ut_list_clear(&scene->entities);
+	ut_list_clear(&scene->added_entities);
 	
     scene->methods->free(scene);
 }

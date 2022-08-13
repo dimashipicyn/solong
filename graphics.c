@@ -1,7 +1,6 @@
 #include "game.h"
 #include "graphics.h"
 #include "texture.h"
-#include "mlx.h"
 
 #include <stdlib.h>
 #include <math.h>

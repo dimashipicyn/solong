@@ -1,7 +1,6 @@
 #include "tank.h"
 #include "keys.h"
 #include "graphics.h"
-#include "libft.h"
 #include "bullet.h"
 #include "utils.h"
 #include "entity.h"
@@ -10,6 +9,7 @@
 
 #include <assert.h>
 #include <SDL.h>
+#include <stdlib.h>
 
 enum tank_state {
 	TANK_SPAWN_STATE,
@@ -355,7 +355,7 @@ static void init_tank(t_tank* tank, t_tank_def def)
 
 t_tank* new_tank(t_tank_def def)
 {
-    t_tank* tank = ft_calloc(1, sizeof(t_tank));
+    t_tank* tank = calloc(1, sizeof(t_tank));
     init_tank(tank, def);
     return tank;
 }

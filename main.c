@@ -1,7 +1,5 @@
-#include "mlx.h"
 #include "game.h"
 #include "utils.h"
-#include "libft.h"
 #include "tank.h"
 #include "vector.h"
 #include "framerate.h"
@@ -11,8 +9,10 @@
 #include "menu_scene.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <SDL.h>
+#include <stdio.h>
 
 static const int32_t tick_time = 1000 / 60;
 
@@ -68,8 +68,8 @@ char* get_current_dir(char** env)
 {
     while (*env)
     {
-        if (ft_strncmp(*env, "PWD", 3) == 0) {
-            char* s = ft_strchr(*env, '=');
+        if (strncmp(*env, "PWD", 3) == 0) {
+            char* s = strchr(*env, '=');
             return ++s;
         }
         env++;
@@ -84,15 +84,15 @@ t_game_ctx* init_game(char** env)
 
     game = calloc(1, sizeof(t_game_ctx));
     if (!game) {
-        ft_printf("Could not initialize game. Bad alloc.\n");
+        printf("Could not initialize game. Bad alloc.\n");
         return NULL;
     }
     
     char* path_to_cur_dir = get_current_dir(env);
     
     char buf[256];
-    ft_strlcpy(buf, path_to_cur_dir, 256);
-    ft_strlcat(buf, "/settings.yml", 256);
+    strlcpy(buf, path_to_cur_dir, 256);
+    strlcat(buf, "/settings.yml", 256);
     if (load_settings(buf)) {
         goto error;
     }
@@ -100,12 +100,12 @@ t_game_ctx* init_game(char** env)
     t_settings* s = get_settings();
     graphics = init_graphics(s->resolution_w, s->resolution_h, s->game_name);
     if (!graphics) {
-        ft_printf("Could not initialize graphics.\n");
+        printf("Could not initialize graphics.\n");
         goto error;
     }
 
     if (load_textures(graphics, path_to_cur_dir)) {
-        ft_printf("Loading textures failed.\n");
+        printf("Loading textures failed.\n");
         goto error;
     }
 
@@ -132,7 +132,7 @@ error:
 int main(int ac, char** argv, char** env) {
     t_game_ctx* game = init_game(env);
     if (!game) {
-        ft_printf("Could not init game!\n");
+        printf("Could not init game!\n");
         return 1;
     }
 

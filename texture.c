@@ -1,5 +1,4 @@
-#include "libft.h"
-#include "mlx.h"
+#include "utils.h"
 
 #include "texture.h"
 #include "graphics.h"
@@ -10,6 +9,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <string.h>
 
 static t_texture textures[TOTAL_TEXTURES];
 
@@ -49,13 +49,13 @@ int load_textures(t_graphics* ctx, char* path_to_cur_dir)
 	int txr_id = 0;
 	while (txr_id < TOTAL_TEXTURES)
 	{
-		ft_memset(filename, 0, MAX_SIZE_PATH);
-		ft_strlcat(filename, path_to_cur_dir, MAX_SIZE_PATH);
-		ft_strlcat(filename, texture_filenames[txr_id], MAX_SIZE_PATH);
+		memset(filename, 0, MAX_SIZE_PATH);
+		strlcat(filename, path_to_cur_dir, MAX_SIZE_PATH);
+		strlcat(filename, texture_filenames[txr_id], MAX_SIZE_PATH);
 
 		SDL_Surface* image = IMG_Load(filename);
 		if (image == NULL) {
-			ft_printf("Could not load texture: %s\n", filename);
+			printf("Could not load texture: %s\n", filename);
 			goto error;
 		}
 		SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 0, 0, 0x01));

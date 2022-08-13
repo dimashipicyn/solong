@@ -1,5 +1,5 @@
 #include "game_map.h"
-#include "libft.h"
+#include "utils.h"
 #include "graphics.h"
 #include "texture.h"
 #include "physics.h"
@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
+#include <string.h>
+#include <stdio.h>
 
 typedef enum {
     EMPTY       = '0' - '0',
@@ -73,7 +75,7 @@ static int load_map(t_game_map* map, char* filename);
 
 t_game_map* new_game_map(char* filename)
 {
-    t_game_map* map = ft_calloc(1, sizeof(t_game_map));
+    t_game_map* map = calloc(1, sizeof(t_game_map));
 
     if (load_map(map, filename)) {
         free(map);
@@ -154,7 +156,7 @@ static int load_map(t_game_map* map, char* filename)
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 	{
-		ft_printf("Dont open map!\n");
+		printf("Dont open map!\n");
 		return 1;
 	}
 
@@ -164,19 +166,19 @@ static int load_map(t_game_map* map, char* filename)
 	int res = get_next_line(fd, &line);
 	while (res > 0)
 	{
-		ft_list_push_back(&list, line);
+		ut_list_push_back(&list, line);
 		res = get_next_line(fd, &line);
 	}
-	ft_list_push_back(&list, line);
+	ut_list_push_back(&list, line);
 
     if (res == -1) {
-        ft_list_foreach(list, free);
-        ft_list_clear(&list);
+        ut_list_foreach(list, free);
+        ut_list_clear(&list);
         return 1;
     }
 
-	size_t height = ft_list_size(list);
-	size_t width = ft_strlen(list->content);
+	size_t height = ut_list_size(list);
+	size_t width = strlen(list->content);
 	t_terrain* tiles = calloc(height * width, sizeof(t_terrain));
 
     size_t x = 0;
@@ -217,7 +219,7 @@ static int load_map(t_game_map* map, char* filename)
         y++;
 	}
 
-	ft_list_clear(&list);
+	ut_list_clear(&list);
 
 	map->tiles = tiles;
     map->width = width;
