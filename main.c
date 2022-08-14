@@ -7,6 +7,7 @@
 #include "settings.h"
 #include "main_scene.h"
 #include "menu_scene.h"
+#include "editor_scene.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -58,6 +59,17 @@ void loop(t_game_ctx* game)
                 quit = 1;
                 break;
         }
+		if (event.type == SDL_MOUSEMOTION) {
+			SDL_GetMouseState(&game->mouse.x, &game->mouse.y);
+		}
+		game->mouse.is_press_l = 0;
+		if (event.type == SDL_MOUSEBUTTONUP) {
+			game->mouse.is_press_l = 1;
+		}
+		if (event.type == SDL_MOUSEBUTTONDOWN) {
+			game->mouse.is_press_l = 0;
+		}
+		
 		game->keys = SDL_GetKeyboardState(NULL);
 
 		loop_callback(game);
@@ -111,13 +123,14 @@ t_game_ctx* init_game(char** env)
 
 	game->scenes[MAIN_SCENE] = new_main_scene();
 	game->scenes[MENU_SCENE] = new_menu_scene();
+	game->scenes[EDITOR_SCENE] = new_editor_scene();
 
 	for (int i = 0; i < TOTAL_SCENES; i++) {
 		scene_preload(game->scenes[i], game);
 		scene_create(game->scenes[i], game);
 	}
 
-	game->active_scene = game->scenes[MAIN_SCENE];
+	game->active_scene = game->scenes[EDITOR_SCENE];
     game->graphics = graphics;
 	
     return game;

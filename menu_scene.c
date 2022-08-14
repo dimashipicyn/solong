@@ -14,10 +14,17 @@
 #include <stdlib.h>
 #include <SDL.h>
 
+enum {
+	CURSOR,
+	TEXTURES_MAX_SIZE
+};
+
 typedef struct s_menu_scene
 {
 	t_scene		base_scene;
-	t_game_map*	map;
+	t_texture	textures[TEXTURES_MAX_SIZE];
+	t_sprite	sprites[TEXTURES_MAX_SIZE];
+	int32_t		textures_size;
 	t_animation	cursor;
 } t_menu_scene;
 
@@ -54,7 +61,9 @@ void menu_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
 
-	//scene->map = new_game_map("menu.ber");
+	scene->textures[scene->textures_size++] = load_texture("/assets/tank_yellow_spritesheet.png", game_ctx->graphics);
+
+	
 }
 
 void menu_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
@@ -84,7 +93,6 @@ void menu_scene_render(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
 
-	draw_game_map(scene->map, game_ctx->graphics);
 	draw_sprite_to_frame(game_ctx->graphics, get_animation_sprite(&scene->cursor));
 }
 

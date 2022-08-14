@@ -21,6 +21,8 @@ typedef struct SDL_Texture SDL_Texture;
 
 typedef struct s_texture {
 	SDL_Texture* texture;
+	int32_t w;
+	int32_t h;
 } t_texture;
 
 typedef struct s_graphics t_graphics;
@@ -28,5 +30,8 @@ typedef struct s_graphics t_graphics;
 int load_textures(t_graphics* ctx, char* path_to_cur_dir);
 t_texture* get_texture(t_texture_id id);
 void set_texture_filename(char* filename, t_texture_id id);
+
+t_texture load_texture(char* filename, t_graphics* ctx);
+void destroy_texture(t_texture texture);
 
 #endif

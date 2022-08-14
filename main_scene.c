@@ -78,7 +78,8 @@ void main_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 	(void)game_ctx;
     t_main_scene* scene = (t_main_scene*)_scene;
 
-	scene->game_map = new_game_map("map.ber");
+	scene->game_map = new_game_map();
+	//load_map(scene->game_map, "map.ber");
 }
 
 void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
@@ -105,7 +106,7 @@ void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 
 	scene_add_entity(_scene, (t_entity*)player_one);
 	scene_add_entity(_scene, (t_entity*)player_two);
-	scene_add_entity(_scene, (t_entity*)tank_factory(scene));
+	//scene_add_entity(_scene, (t_entity*)tank_factory(scene));
 }
 
 void main_scene_update(t_scene* _scene, t_game_ctx* game_ctx)

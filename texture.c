@@ -78,3 +78,29 @@ error:
 	}
 	return 1;
 }
+
+t_texture load_texture(char* filename, t_graphics* ctx)
+{
+	IMG_Init(IMG_INIT_PNG);
+
+	t_texture texture = {NULL};
+
+	SDL_Surface* image = IMG_Load(filename);
+	if (image == NULL) {
+		printf("Could not load texture: %s\n", filename);
+		return texture;
+	}
+	SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 0, 0, 0x01));
+
+	texture.texture = SDL_CreateTextureFromSurface(ctx->renderer, image);
+	texture.w = image->w;
+	texture.h = image->h;
+	
+	SDL_FreeSurface(image);
+	return texture;
+}
+
+void destroy_texture(t_texture texture)
+{
+	SDL_DestroyTexture(texture.texture);
+}

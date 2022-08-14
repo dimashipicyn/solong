@@ -41,8 +41,9 @@ static void update(t_entity* entity, t_game_ctx* game_ctx)
                 bullet->anim = animation(sprite, 3, 300, 0, 1);
                 bullet->state = EXPLOSION;
 
-
-				entity_damage(contacted_entity, game_ctx, bullet->damage);
+				if (contacted_entity) {
+					entity_damage(contacted_entity, game_ctx, bullet->damage);
+				}
             }
             break;
         }

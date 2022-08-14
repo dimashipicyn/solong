@@ -13,20 +13,6 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef enum {
-    EMPTY       = '0' - '0',
-    BRICK       = '1' - '0',
-    CONCRETE    = '2' - '0',
-    WATER       = '3' - '0',
-    FOREST      = '4' - '0',
-    ICE         = '5' - '0',
-    PLAYER_1    = 'P' - '0',
-	PLAYER_2    = 'T' - '0',
-	ENEMY    	= 'E' - '0',
-    BASE_OREL   = 'B' - '0',
-    TILE_TYPE_SIZE
-} t_tile_type;
-
 enum {
     DEFAULT_ARMOR = 0,
     BRICK_ARMOR = 100,
@@ -49,6 +35,7 @@ typedef struct s_game_map
     t_vec2      player_one_spawn_pos;
 	t_vec2      player_two_spawn_pos;
 	t_vec2      enemies_spawn_pos;
+	t_physic_body* bodyes[4];
 } t_game_map;
 
 static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
@@ -71,16 +58,47 @@ static t_entity_methods map_methods = {
 
 static t_sprite sprites[TILE_TYPE_SIZE];
 
-static int load_map(t_game_map* map, char* filename);
-
-t_game_map* new_game_map(char* filename)
+t_game_map* new_game_map()
 {
     t_game_map* map = calloc(1, sizeof(t_game_map));
 
-    if (load_map(map, filename)) {
-        free(map);
-        return NULL;
-    }
+	size_t height = 28;
+	size_t width = 28;
+	t_terrain* tiles = calloc(height * width, sizeof(t_terrain));
+
+	map->width = width;
+    map->height = height;
+	map->tiles = tiles;
+
+	for (size_t y = 0; y < map->height; y++) {
+		for (size_t x = 0; x < map->width; x++) {
+			t_tile_type type = EMPTY;
+
+			init_terrain(map, type, x, y);
+		}
+	}
+
+	map->player_one_spawn_pos = vec2(11 * 16, 25 * 16);
+	map->player_two_spawn_pos = vec2(19 * 16, 26 * 16);
+	map->enemies_spawn_pos = vec2(2 * 16, 2 * 16);
+
+	t_physic_body_def def = {
+		.pos = vec2(-5, -5),
+		.size = vec2(28 * 16, 5),
+		.user_data = NULL,
+		.layer = PHYSICS_LAYER_1
+	};
+	map->bodyes[0] = create_physic_body(def);
+
+	def.size = vec2(5, 28 * 16);
+	map->bodyes[1] = create_physic_body(def);
+
+	def.pos = vec2(28 * 16 + 5, -5);
+	map->bodyes[2] = create_physic_body(def);
+
+	def.pos = vec2(-5, 28 * 16 + 5);
+	def.size = vec2(28 * 16, 5);
+	map->bodyes[3] = create_physic_body(def);
 
     sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID),    {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(16,16)}};
     sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(8,8)}};
@@ -95,6 +113,13 @@ t_game_map* new_game_map(char* filename)
 
 void delete_game_map(t_game_map* game_map)
 {
+	for (size_t i = 0; i < 28 * 28; i++) {
+		t_terrain* t = &game_map->tiles[i];
+		if (t->body) {
+			free_physic_body(t->body);
+		}
+	}
+
     free(game_map->tiles);
     free(game_map);
 }
@@ -129,8 +154,10 @@ int32_t get_armor_from_type(t_tile_type type)
     return DEFAULT_ARMOR;
 }
 
-void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
+void init_terrain(t_game_map* map, t_tile_type type, int x, int y)
 {
+	t_terrain* terrain = &map->tiles[y * map->width + x];
+
     terrain->type = type;
     terrain->body = NULL;
     terrain->methods = &map_methods;
@@ -149,7 +176,17 @@ void init_terrain(t_terrain* terrain, t_tile_type type, int x, int y)
     }
 }
 
-static int load_map(t_game_map* map, char* filename)
+void destroy_terrain(t_game_map* map, int x, int y)
+{
+	t_terrain* terrain = &map->tiles[y * map->width + x];
+
+	if (terrain->body) {
+		free_physic_body(terrain->body);
+	}
+	terrain->type = EMPTY;
+}
+
+int load_map(t_game_map* map, char* filename)
 {
 	int fd;
 
@@ -160,71 +197,46 @@ static int load_map(t_game_map* map, char* filename)
 		return 1;
 	}
 
-	t_list *list = NULL;
-	char *line = NULL;
-	
-	int res = get_next_line(fd, &line);
-	while (res > 0)
-	{
-		ut_list_push_back(&list, line);
-		res = get_next_line(fd, &line);
-	}
-	ut_list_push_back(&list, line);
+	char buf[29] = {0};
 
-    if (res == -1) {
-        ut_list_foreach(list, free);
-        ut_list_clear(&list);
-        return 1;
-    }
+	for (size_t y = 0; y < map->height; y++) {
+		read(fd, buf, 29);
+		for (size_t x = 0; x < map->width; x++) {
+			t_tile_type type = buf[x] - '0';
 
-	size_t height = ut_list_size(list);
-	size_t width = strlen(list->content);
-	t_terrain* tiles = calloc(height * width, sizeof(t_terrain));
-
-    size_t x = 0;
-    size_t y = 0;
-
-	t_list* it_list = list;
-	t_terrain* it_tiles = tiles;
-	while (it_list)
-	{
-        char* row = it_list->content;
-        x = 0;
-		while (*row) {
-            t_tile_type type = *row - '0';
-
-            init_terrain(it_tiles, type, x, y);
-
-            if (type == PLAYER_1)
-            {
-                map->player_one_spawn_pos = vec2(x * 16, y * 16);
-                it_tiles->type = EMPTY;
-            }
-			if (type == PLAYER_2)
-            {
-                map->player_two_spawn_pos = vec2(x * 16, y * 16);
-                it_tiles->type = EMPTY;
-            }
-			if (type == ENEMY)
-            {
-                map->enemies_spawn_pos = vec2(x * 16, y * 16);
-                it_tiles->type = EMPTY;
-            }
-
-            ++row;
-            ++it_tiles;
-            x++;
-        }
-		it_list = it_list->next;
-        y++;
+			init_terrain(map, type, x, y);
+		}
 	}
 
-	ut_list_clear(&list);
-
-	map->tiles = tiles;
-    map->width = width;
-    map->height = height;
     return 0;
+}
+
+int save_map(t_game_map* map, char* filename)
+{
+	int fd;
+
+	fd = open(filename, O_WRONLY | O_TRUNC);
+	if (fd == -1)
+	{
+		printf("Dont open map!\n");
+		return 1;
+	}
+
+	size_t height = 28;
+	size_t width = 28;
+
+	char buf[29];
+	for (size_t y = 0; y < height; y++) {
+		for (size_t x = 0; x < width; x++) {
+			t_tile_type type = map->tiles[y * width + x].type;
+
+			buf[x] = type + '0';
+		}
+		buf[28] = '\n';
+		write(fd, buf, 29);
+	}
+
+	return 0;
 }
 
 void draw_game_map(t_game_map* game_map, t_graphics* graphics)
@@ -262,7 +274,9 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
         }
         row++;
     }
-    draw_sprite_to_frame(graphics, orel);
+	if (orel.texture) {
+		draw_sprite_to_frame(graphics, orel);
+	}
 }
 
 t_vec2 get_player_one_spawn_pos(t_game_map* map)

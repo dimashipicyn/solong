@@ -13,6 +13,7 @@ typedef struct s_keys t_keys;
 typedef enum e_scene_type {
 	MENU_SCENE,
     MAIN_SCENE,
+	EDITOR_SCENE,
     TOTAL_SCENES
 } t_scene_type;
 
@@ -21,6 +22,7 @@ typedef struct s_game_ctx {
     t_scene     	*scenes[TOTAL_SCENES];
     t_scene     	*active_scene;
     const uint8_t	*keys;
+	t_mouse			mouse;
 	int64_t			lag;
 	int64_t			previous_time;
     int64_t     	elapsed;

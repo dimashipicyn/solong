@@ -68,6 +68,14 @@ typedef struct s_keys
     int8_t pressed[300];
 } t_keys;
 
+typedef struct s_mouse
+{
+	int x;
+	int y;
+	int is_press_l;
+	int is_press_r;
+} t_mouse;
+
 int		key_init(int keycode, t_keys* keys);
 int		key_destroy(int keycode, t_keys* keys);
 
