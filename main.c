@@ -35,7 +35,6 @@ int loop_callback(void* data)
 
     scene_render(game_ctx->active_scene, game_ctx);
     //draw_framerate(graphics, game_ctx->elapsed);
-    render_frame(graphics);
 
     return 0;
 }
@@ -66,13 +65,17 @@ void loop(t_game_ctx* game)
 		if (event.type == SDL_MOUSEBUTTONUP) {
 			game->mouse.is_press_l = 1;
 		}
-		if (event.type == SDL_MOUSEBUTTONDOWN) {
-			game->mouse.is_press_l = 0;
-		}
+		//if (event.type == SDL_MOUSEBUTTONDOWN) {
+		//	game->mouse.is_press_l = 0;
+		//}
 		
 		game->keys = SDL_GetKeyboardState(NULL);
 
+		clear_frame(game->graphics);
+
 		loop_callback(game);
+
+		render_frame(game->graphics);
     }
 }
 
@@ -130,7 +133,7 @@ t_game_ctx* init_game(char** env)
 		scene_create(game->scenes[i], game);
 	}
 
-	game->active_scene = game->scenes[EDITOR_SCENE];
+	game->active_scene = game->scenes[MAIN_SCENE];
     game->graphics = graphics;
 	
     return game;

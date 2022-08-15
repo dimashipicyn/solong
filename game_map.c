@@ -13,31 +13,6 @@
 #include <string.h>
 #include <stdio.h>
 
-enum {
-    DEFAULT_ARMOR = 0,
-    BRICK_ARMOR = 100,
-    CONCRETE_ARMOR = 500
-};
-
-typedef struct s_terrain
-{
-    t_entity_methods*  methods;
-    t_tile_type     type;
-    t_physic_body*  body;
-    int32_t         armor;
-} t_terrain;
-
-typedef struct s_game_map
-{
-	t_terrain*  tiles;
-	size_t		width;
-	size_t		height;
-    t_vec2      player_one_spawn_pos;
-	t_vec2      player_two_spawn_pos;
-	t_vec2      enemies_spawn_pos;
-	t_physic_body* bodyes[4];
-} t_game_map;
-
 static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 {
 	(void)game_ctx;
@@ -55,8 +30,6 @@ static void damage(t_entity* entity, t_game_ctx* game_ctx, int32_t damage)
 static t_entity_methods map_methods = {
     .damage = damage
 };
-
-static t_sprite sprites[TILE_TYPE_SIZE];
 
 t_game_map* new_game_map()
 {
@@ -78,10 +51,6 @@ t_game_map* new_game_map()
 		}
 	}
 
-	map->player_one_spawn_pos = vec2(11 * 16, 25 * 16);
-	map->player_two_spawn_pos = vec2(19 * 16, 26 * 16);
-	map->enemies_spawn_pos = vec2(2 * 16, 2 * 16);
-
 	t_physic_body_def def = {
 		.pos = vec2(-5, -5),
 		.size = vec2(28 * 16, 5),
@@ -100,13 +69,13 @@ t_game_map* new_game_map()
 	def.size = vec2(28 * 16, 5);
 	map->bodyes[3] = create_physic_body(def);
 
-    sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID),    {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(16,16)}};
-    sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(8,8)}};
-    sprites[CONCRETE]	= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(8,0),vec2(8,8)}};
-    sprites[FOREST]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(16,0),vec2(8,8)}};
-    sprites[ICE]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(24,0),vec2(8,8)}};
-    sprites[WATER]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(32,0),vec2(8,8)}};
-    sprites[BASE_OREL]	= (t_sprite){get_texture(OREL_TXR_ID),    {vec2(0,0),vec2(32,32)}, {vec2(0,0),vec2(16,16)}};
+    map->sprites[EMPTY]		= (t_sprite){get_texture(DIRT_TXR_ID),    {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(16,16)}};
+    map->sprites[BRICK]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(0,0),vec2(8,8)}};
+    map->sprites[CONCRETE]	= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(8,0),vec2(8,8)}};
+    map->sprites[FOREST]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(16,0),vec2(8,8)}};
+    map->sprites[ICE]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(24,0),vec2(8,8)}};
+    map->sprites[WATER]		= (t_sprite){get_texture(TERRAIN_TXR_ID), {vec2(0,0),vec2(16,16)}, {vec2(32,0),vec2(8,8)}};
+    map->sprites[BASE_OREL]	= (t_sprite){get_texture(OREL_TXR_ID),    {vec2(0,0),vec2(32,32)}, {vec2(0,0),vec2(16,16)}};
     
     return map;
 }
@@ -208,6 +177,8 @@ int load_map(t_game_map* map, char* filename)
 		}
 	}
 
+	close(fd);
+
     return 0;
 }
 
@@ -215,10 +186,10 @@ int save_map(t_game_map* map, char* filename)
 {
 	int fd;
 
-	fd = open(filename, O_WRONLY | O_TRUNC);
+	fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT);
 	if (fd == -1)
 	{
-		printf("Dont open map!\n");
+		printf("Dont open file: %s!\n", filename);
 		return 1;
 	}
 
@@ -235,6 +206,8 @@ int save_map(t_game_map* map, char* filename)
 		buf[28] = '\n';
 		write(fd, buf, 29);
 	}
+
+	close(fd);
 
 	return 0;
 }
@@ -256,12 +229,12 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
         {
             t_terrain terrain = tiles[row * game_map->width + col];
             
-            t_sprite sprite_empty = sprites[EMPTY];
+            t_sprite sprite_empty = game_map->sprites[EMPTY];
             sprite_empty.dest.pos.x = col * sprite_empty.dest.size.x;
             sprite_empty.dest.pos.y = row * sprite_empty.dest.size.y;
             draw_sprite_to_frame(graphics, sprite_empty);
             
-            t_sprite sprite = sprites[terrain.type];
+            t_sprite sprite = game_map->sprites[terrain.type];
             sprite.dest.pos.x = col * 16;
             sprite.dest.pos.y = row * 16;
             
@@ -279,17 +252,17 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
 	}
 }
 
-t_vec2 get_player_one_spawn_pos(t_game_map* map)
-{
-    return map->player_one_spawn_pos;
-}
-
-t_vec2 get_player_two_spawn_pos(t_game_map* map)
-{
-	return map->player_two_spawn_pos;
-}
-
-t_vec2 get_enemies_spawn_pos(t_game_map* map)
-{
-	return map->enemies_spawn_pos;
-}
+//t_vec2 get_player_one_spawn_pos(t_game_map* map)
+//{
+//    return map->player_one_spawn_pos;
+//}
+//
+//t_vec2 get_player_two_spawn_pos(t_game_map* map)
+//{
+//	return map->player_two_spawn_pos;
+//}
+//
+//t_vec2 get_enemies_spawn_pos(t_game_map* map)
+//{
+//	return map->enemies_spawn_pos;
+//}

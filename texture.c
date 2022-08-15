@@ -83,7 +83,7 @@ t_texture load_texture(char* filename, t_graphics* ctx)
 {
 	IMG_Init(IMG_INIT_PNG);
 
-	t_texture texture = {NULL};
+	t_texture texture = {NULL, 0, 0};
 
 	SDL_Surface* image = IMG_Load(filename);
 	if (image == NULL) {

@@ -18,7 +18,7 @@ int (*cmp)(void *, void *))
 			if (cmp(array + i, array + i + size) > 0)
 			{
 				issort = 0;
-				ft_swap(array + i, array + i + size, size);
+				ut_swap(array + i, array + i + size, size);
 			}
 			i += size;
 		}

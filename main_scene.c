@@ -20,6 +20,7 @@ typedef struct s_main_scene
 {
 	t_scene		base_scene;
     t_game_map*	game_map;
+	int64_t		last_spawn_time;
 } t_main_scene;
 
 static void main_scene_preload(t_scene* scene, t_game_ctx* game_ctx);
@@ -36,16 +37,15 @@ static t_scene_methods methods = {
     .free = main_scene_free
 };
 
-t_tank* tank_factory(t_main_scene* scene)
+t_tank* tank_factory(t_main_scene* scene, t_vec2 pos)
 {
-	t_vec2 pos = get_enemies_spawn_pos(scene->game_map);
 	t_tank_def def;
 	def.pos = pos;
 	def.dir = vec2(0, -1);
 	def.input_type = ENEMY_INPUT_TYPE;
 	def.damage = 10;
 	def.hitpoints = 100;
-	def.recharge_time = 300;
+	def.recharge_time = 500;
 	def.velocity = 1;
 	def.bullet_velocity = 2;
 
@@ -79,7 +79,7 @@ void main_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
     t_main_scene* scene = (t_main_scene*)_scene;
 
 	scene->game_map = new_game_map();
-	//load_map(scene->game_map, "map.ber");
+	load_map(scene->game_map, "level_1.map");
 }
 
 void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
@@ -88,30 +88,42 @@ void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
     t_main_scene* scene = (t_main_scene*)_scene;
 
 	t_tank_def def;
-	def.pos = vec2_add(get_player_one_spawn_pos(scene->game_map), vec2(16,16));
+	def.pos = vec2(10*16,27*16);
 	def.dir = vec2(0, -1);
 	def.input_type = PLAYER_ONE_INPUT_TYPE;
-	def.damage = 10;
+	def.damage = 100;
 	def.hitpoints = 127;
-	def.recharge_time = 1000;
-	def.velocity = 1;
-	def.bullet_velocity = 2;
+	def.recharge_time = 500;
+	def.velocity = 3;
+	def.bullet_velocity = 10;
 
 	t_tank* player_one = new_tank(def);
 
-	def.pos = get_player_two_spawn_pos(scene->game_map);
+	def.pos = vec2(18*16,27*16);
 	def.input_type = PLAYER_TWO_INPUT_TYPE;
 
 	t_tank* player_two = new_tank(def);
 
 	scene_add_entity(_scene, (t_entity*)player_one);
 	scene_add_entity(_scene, (t_entity*)player_two);
-	//scene_add_entity(_scene, (t_entity*)tank_factory(scene));
+	scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(16, 16)));
+	scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(14*16, 16)));
+	scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(27*16, 16)));
+
+	scene->last_spawn_time = get_time();
 }
 
 void main_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 {
     t_main_scene* scene = (t_main_scene*)_scene;
+
+	int64_t diff_time = get_time() - scene->last_spawn_time;
+	if (diff_time > 10000) {
+		scene->last_spawn_time = get_time();
+		scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(16, 16)));
+		scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(14*16, 16)));
+		scene_add_entity(_scene, (t_entity*)tank_factory(scene, vec2(27*16, 16)));
+	}
 }
 
 void main_scene_render(t_scene* _scene, t_game_ctx* game_ctx)
