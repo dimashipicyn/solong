@@ -80,14 +80,20 @@ t_game_map* new_game_map()
     return map;
 }
 
-void delete_game_map(t_game_map* game_map)
+void destroy_map(t_game_map* map)
 {
 	for (size_t i = 0; i < 28 * 28; i++) {
-		t_terrain* t = &game_map->tiles[i];
+		t_terrain* t = &map->tiles[i];
 		if (t->body) {
 			free_physic_body(t->body);
+			t->body = NULL;
 		}
 	}
+}
+
+void delete_game_map(t_game_map* game_map)
+{
+	destroy_map(game_map);
 
     free(game_map->tiles);
     free(game_map);
@@ -165,6 +171,8 @@ int load_map(t_game_map* map, char* filename)
 		printf("Dont open map!\n");
 		return 1;
 	}
+
+	destroy_map(map);
 
 	char buf[29] = {0};
 
@@ -251,18 +259,3 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
 		draw_sprite_to_frame(graphics, orel);
 	}
 }
-
-//t_vec2 get_player_one_spawn_pos(t_game_map* map)
-//{
-//    return map->player_one_spawn_pos;
-//}
-//
-//t_vec2 get_player_two_spawn_pos(t_game_map* map)
-//{
-//	return map->player_two_spawn_pos;
-//}
-//
-//t_vec2 get_enemies_spawn_pos(t_game_map* map)
-//{
-//	return map->enemies_spawn_pos;
-//}

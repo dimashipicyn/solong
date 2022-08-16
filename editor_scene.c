@@ -119,7 +119,7 @@ void editor_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 		}
 	}
 	if (game_ctx->keys[SDL_SCANCODE_ESCAPE]) {
-		save_map(scene->map, "level_1.map");
+		save_map(scene->map, "level_2.map");
 	}
 
 	scene->cursor.dest.pos = vec2(mouse.x - 8, mouse.y - 8);

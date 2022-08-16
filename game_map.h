@@ -50,10 +50,8 @@ t_game_map* new_game_map();
 void delete_game_map(t_game_map* game_map);
 void init_terrain(t_game_map* map, t_tile_type type, int x, int y);
 void draw_game_map(t_game_map* game_map, t_graphics* graphics);
-//t_vec2 get_player_one_spawn_pos(t_game_map* map);
-//t_vec2 get_player_two_spawn_pos(t_game_map* map);
-//t_vec2 get_enemies_spawn_pos(t_game_map* map);
 int load_map(t_game_map* map, char* filename);
 int save_map(t_game_map* map, char* filename);
+void destroy_map(t_game_map* map);
 
 #endif

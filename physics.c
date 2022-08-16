@@ -48,6 +48,33 @@ void free_physic_world(t_physic_world* w)
     free(w);
 }
 
+void intersect_physic_body(t_physic_body* body_1)
+{
+	t_physic_world *w = &physic_world;
+
+	body_1->contact = 0;
+	body_1->contacted_body = NULL;
+
+	for (t_list* it2 = w->dynamic_bodies; it2 != NULL; it2 = it2->next)
+	{
+		t_physic_body* body_2 = it2->content;
+
+		if (body_1 == body_2) {
+			continue;
+		}
+
+		if (body_1->layer & body_2->layer && intersect(body_1->rect, body_2->rect)) {
+			body_1->contact = 1;
+			body_1->contacted_body = body_2;
+			body_1->velocity = 0;
+			body_2->contact = 1;
+			body_2->contacted_body = body_1;
+			body_2->velocity = 0;
+			break;
+		}
+	}
+}
+
 void step_physic_world()
 {
     t_physic_world *w = &physic_world;
@@ -130,7 +157,9 @@ t_physic_body* create_physic_body(t_physic_body_def def)
 
 void free_physic_body(t_physic_body* b)
 {
-    ut_list_remove_if(&physic_world.static_bodies, b, cmp);
-    ut_list_remove_if(&physic_world.dynamic_bodies, b, cmp);
-    free(b);
+	if (b) {
+		ut_list_remove_if(&physic_world.static_bodies, b, cmp);
+		ut_list_remove_if(&physic_world.dynamic_bodies, b, cmp);
+		free(b);
+	}
 }

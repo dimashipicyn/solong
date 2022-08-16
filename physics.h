@@ -55,5 +55,6 @@ void                step_physic_world();
 
 t_physic_body*      create_physic_body(t_physic_body_def def);
 void                free_physic_body(t_physic_body* b);
+void				intersect_physic_body(t_physic_body* body_1);
 
 #endif

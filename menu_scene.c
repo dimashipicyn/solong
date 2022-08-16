@@ -84,9 +84,9 @@ void menu_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 
 	update_animation(&scene->cursor, game_ctx->elapsed);
 
-	if (game_ctx->keys[SDL_SCANCODE_KP_ENTER]) {
-		game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
-	}
+	//if (game_ctx->keys[SDL_SCANCODE_KP_ENTER]) {
+	//	game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
+	//}
 }
 
 void menu_scene_render(t_scene* _scene, t_game_ctx* game_ctx)

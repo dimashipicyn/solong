@@ -78,13 +78,18 @@ void scene_add_entity(t_scene* scene, t_entity* entity)
 	ut_list_push_back(&scene->added_entities, entity);
 }
 
-void scene_free(t_scene* scene)
+void scene_clear_entities(t_scene* scene)
 {
 	for (t_list* it = scene->entities; it != NULL; it = it->next) {
 		entity_free(it->content);
 	}
 	ut_list_clear(&scene->entities);
 	ut_list_clear(&scene->added_entities);
+}
+
+void scene_free(t_scene* scene)
+{
+	scene_clear_entities(scene);
 	
     scene->methods->free(scene);
 }

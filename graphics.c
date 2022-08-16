@@ -135,11 +135,12 @@ t_graphics *init_graphics(int width, int height, char* title)
         return NULL;
     }
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer) {
 		SDL_DestroyWindow(window);
 		return NULL;
 	}
+	SDL_SetRenderDrawColor(renderer, 0x3F, 0x3F, 0x3F, 0xFF);
 
     t_graphics  *graphics = calloc(1, sizeof(t_graphics));
 

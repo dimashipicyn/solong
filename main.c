@@ -25,7 +25,7 @@ int loop_callback(void* data)
     int64_t start = get_time();
     game_ctx->elapsed = start - game_ctx->previous_time;
     game_ctx->previous_time = start;
-    game_ctx->lag += game_ctx->elapsed;
+	game_ctx->lag += game_ctx->elapsed;
 
     while (game_ctx->lag >= tick_time) {
         scene_update(game_ctx->active_scene, game_ctx);
@@ -34,7 +34,7 @@ int loop_callback(void* data)
     }
 
     scene_render(game_ctx->active_scene, game_ctx);
-    //draw_framerate(graphics, game_ctx->elapsed);
+    draw_framerate(graphics, game_ctx->elapsed);
 
     return 0;
 }
@@ -113,7 +113,7 @@ t_game_ctx* init_game(char** env)
     }
     
     t_settings* s = get_settings();
-    graphics = init_graphics(s->resolution_w, s->resolution_h, s->game_name);
+    graphics = init_graphics(500, 448, s->game_name);
     if (!graphics) {
         printf("Could not initialize graphics.\n");
         goto error;

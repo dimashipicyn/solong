@@ -30,7 +30,6 @@ void draw_number(t_graphics* graphics, t_point dest, int32_t number)
         sprite.dest.pos.x += (sprite.dest.size.x + 1);
         ++i;
     }
-    free(snum);
 }
 
 static int32_t counter = 0;
