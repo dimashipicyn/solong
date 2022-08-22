@@ -2,10 +2,10 @@
 # define GRAPHICS_H
 
 #include "vector.h"
+#include "texture.h"
 
 #include <stdint.h>
 
-typedef struct s_texture t_texture;
 typedef struct SDL_Window SDL_Window;
 typedef struct SDL_Renderer SDL_Renderer;
 typedef struct SDL_Texture SDL_Texture;
@@ -13,6 +13,8 @@ typedef struct SDL_Texture SDL_Texture;
 typedef struct s_graphics {
     SDL_Window*		window;
 	SDL_Renderer*	renderer;
+    int32_t         w;
+    int32_t         h;
 } t_graphics;
 
 typedef struct s_line {
@@ -37,7 +39,7 @@ typedef struct s_triangle {
 } t_triangle;
 
 typedef struct s_sprite {
-    t_texture*  texture;
+    t_texture   texture;
     t_rect      dest;
     t_rect      src; 
 } t_sprite;

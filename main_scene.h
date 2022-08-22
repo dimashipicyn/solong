@@ -11,6 +11,7 @@
 #include "scene.h"
 
 t_scene*    new_main_scene();
+void        set_two_players(t_scene* s);
 void        delete_main_scene(t_scene* scene);
 
 #endif /* main_scene_h */

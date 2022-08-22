@@ -96,6 +96,11 @@ t_game_ctx* init_game(char** env)
 {
     t_game_ctx* game = NULL;
     t_graphics* graphics = NULL;
+    
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        printf("Could not initialize video or audio.\n");
+        return NULL;
+    }
 
     game = calloc(1, sizeof(t_game_ctx));
     if (!game) {
@@ -123,6 +128,8 @@ t_game_ctx* init_game(char** env)
         printf("Loading textures failed.\n");
         goto error;
     }
+    
+    game->graphics = graphics;
 
 	game->scenes[MAIN_SCENE] = new_main_scene();
 	game->scenes[MENU_SCENE] = new_menu_scene();
@@ -133,8 +140,7 @@ t_game_ctx* init_game(char** env)
 		scene_create(game->scenes[i], game);
 	}
 
-	game->active_scene = game->scenes[MAIN_SCENE];
-    game->graphics = graphics;
+	game->active_scene = game->scenes[MENU_SCENE];
 	
     return game;
 

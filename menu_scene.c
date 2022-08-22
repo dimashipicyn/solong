@@ -10,22 +10,23 @@
 #include "texture.h"
 #include "game.h"
 #include "game_map.h"
+#include "main_scene.h"
 
 #include <stdlib.h>
 #include <SDL.h>
+#include <SDL_mixer.h>
 
-enum {
-	CURSOR,
-	TEXTURES_MAX_SIZE
+enum buttons {
+    PLAYER_1,
+    PLAYER_2,
+    CONSTRUCTION,
+    TOTAL_BUTTONS
 };
 
 typedef struct s_menu_scene
 {
 	t_scene		base_scene;
-	t_texture	textures[TEXTURES_MAX_SIZE];
-	t_sprite	sprites[TEXTURES_MAX_SIZE];
-	int32_t		textures_size;
-	t_animation	cursor;
+    t_sprite    buttons[TOTAL_BUTTONS];
 } t_menu_scene;
 
 static void menu_scene_preload(t_scene* scene, t_game_ctx* game_ctx);
@@ -60,40 +61,78 @@ void delete_menu_scene(t_scene* scene)
 void menu_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
-
-	scene->textures[scene->textures_size++] = load_texture("/assets/tank_yellow_spritesheet.png", game_ctx->graphics);
-
-	
+    
+    t_vec2 window_center = vec2(game_ctx->graphics->w/2, game_ctx->graphics->h/2);
+    
+    t_texture txr = load_font("PLAYER 1", "assets/fonts/open-sans/OpenSans-Bold.ttf", game_ctx->graphics);
+    scene->buttons[PLAYER_1] = (t_sprite){
+        txr,
+        {{window_center.x-50,300},{100,25}},
+        {{0,0},{txr.w,txr.h}}
+    };
+    
+    t_texture txr_1 = load_font("PLAYER 2", "assets/fonts/open-sans/OpenSans-Bold.ttf", game_ctx->graphics);
+    scene->buttons[PLAYER_2] = (t_sprite){
+        txr_1,
+        {{window_center.x-50,330},{100,25}},
+        {{0,0},{txr_1.w,txr_1.h}}
+    };
+    
+    t_texture txr_2 = load_font("CONSTRUCTION", "assets/fonts/open-sans/OpenSans-Bold.ttf", game_ctx->graphics);
+    scene->buttons[CONSTRUCTION] = (t_sprite){
+        txr_2,
+        {{window_center.x-70,360},{140,25}},
+        {{0,0},{txr_2.w,txr_2.h}}
+    };
+    
+    Mix_Music *music = Mix_LoadMUS("Imperial-March-Star-Wars.wav");
 }
 
 void menu_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
+}
 
-	t_sprite s;
-	s.texture = get_texture(TANK_YELLOW_TXR_ID);
-	s.src = (t_rect){vec2(96, 0), vec2(16, 16)};
-	//s.dest = (t_rect){get_player_one_spawn_pos(scene->map), vec2(32, 32)};
-
-	scene->cursor = animation(s, 2, 200, 1, 1);
+static int tile_intersect(t_menu_scene* scene, int x, int y)
+{
+    for (int i = 0; i < TOTAL_BUTTONS; i++) {
+        t_rect dest = scene->buttons[i].dest;
+        if ((x > dest.pos.x) && (x < (dest.pos.x + dest.size.x))
+            && (y > dest.pos.y) && (y < (dest.pos.y + dest.size.y))) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void menu_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
-
-	update_animation(&scene->cursor, game_ctx->elapsed);
-
-	//if (game_ctx->keys[SDL_SCANCODE_KP_ENTER]) {
-	//	game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
-	//}
+    
+    t_mouse mouse = game_ctx->mouse;
+    
+    if (mouse.is_press_l) {
+        int id = tile_intersect(scene, mouse.x, mouse.y);
+        if (id == 0) {
+            game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
+        }
+        if (id == 1) {
+            game_ctx->active_scene = game_ctx->scenes[MAIN_SCENE];
+            set_two_players(game_ctx->active_scene);
+        }
+        if (id == 2) {
+            game_ctx->active_scene = game_ctx->scenes[EDITOR_SCENE];
+        }
+    }
 }
 
 void menu_scene_render(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_menu_scene* scene = (t_menu_scene*)_scene;
-
-	draw_sprite_to_frame(game_ctx->graphics, get_animation_sprite(&scene->cursor));
+    
+    draw_sprite_to_frame(game_ctx->graphics, scene->buttons[PLAYER_1]);
+    draw_sprite_to_frame(game_ctx->graphics, scene->buttons[PLAYER_2]);
+    draw_sprite_to_frame(game_ctx->graphics, scene->buttons[CONSTRUCTION]);
 }
 
 void menu_scene_free(t_scene* scene)

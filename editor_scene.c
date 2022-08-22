@@ -49,13 +49,13 @@ t_scene* new_editor_scene()
 	scene->map = new_game_map();
 	scene->type = EMPTY;
 
-	scene->materials[EMPTY]		= (t_rect){vec2(500,16),vec2(16,16)};
-    scene->materials[BRICK]		= (t_rect){vec2(500,40),vec2(16,16)};
-    scene->materials[CONCRETE]	= (t_rect){vec2(500,64),vec2(16,16)};
-    scene->materials[FOREST]	= (t_rect){vec2(500,88),vec2(16,16)};
-    scene->materials[ICE]		= (t_rect){vec2(500,112),vec2(16,16)};
-    scene->materials[WATER]		= (t_rect){vec2(500,136),vec2(16,16)};
-    scene->materials[BASE_OREL]	= (t_rect){vec2(500,160),vec2(16,16)};
+	scene->materials[EMPTY]		= (t_rect){vec2(470,16),vec2(16,16)};
+    scene->materials[BRICK]		= (t_rect){vec2(470,40),vec2(16,16)};
+    scene->materials[CONCRETE]	= (t_rect){vec2(470,64),vec2(16,16)};
+    scene->materials[FOREST]	= (t_rect){vec2(470,88),vec2(16,16)};
+    scene->materials[ICE]		= (t_rect){vec2(470,112),vec2(16,16)};
+    scene->materials[WATER]		= (t_rect){vec2(470,136),vec2(16,16)};
+    scene->materials[BASE_OREL]	= (t_rect){vec2(470,160),vec2(16,16)};
 
 	scene->cursor = scene->map->sprites[EMPTY];
 
@@ -90,7 +90,7 @@ static int check_map(int x, int y)
 	return 1;
 }
 
-int tile_intersect(t_editor_scene* scene, int x, int y)
+static int tile_intersect(t_editor_scene* scene, int x, int y)
 {
 	for (int i = 0; i < TILE_TYPE_SIZE; i++) {
 		t_rect dest = scene->materials[i];
@@ -119,7 +119,7 @@ void editor_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 		}
 	}
 	if (game_ctx->keys[SDL_SCANCODE_ESCAPE]) {
-		save_map(scene->map, "level_2.map");
+		save_map(scene->map, "level_3.map");
 	}
 
 	scene->cursor.dest.pos = vec2(mouse.x - 8, mouse.y - 8);

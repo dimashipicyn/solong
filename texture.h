@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <stdint.h>
+
 typedef enum texture_id {
 	TANK_YELLOW_TXR_ID,
 	TANK_GREEN_TXR_ID,
@@ -28,10 +30,11 @@ typedef struct s_texture {
 typedef struct s_graphics t_graphics;
 
 int load_textures(t_graphics* ctx, char* path_to_cur_dir);
-t_texture* get_texture(t_texture_id id);
+t_texture get_texture(t_texture_id id);
 void set_texture_filename(char* filename, t_texture_id id);
 
 t_texture load_texture(char* filename, t_graphics* ctx);
+t_texture load_font(char* text, char* fontname, t_graphics* ctx);
 void destroy_texture(t_texture texture);
 
 #endif

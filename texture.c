@@ -9,14 +9,15 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <string.h>
 
 static t_texture textures[TOTAL_TEXTURES];
 
-t_texture* get_texture(t_texture_id id)
+t_texture get_texture(t_texture_id id)
 {
 	assert(id >= 0 && id < TOTAL_TEXTURES);
-    return &textures[id];
+    return textures[id];
 }
 
 static char *texture_filenames[TOTAL_TEXTURES] = {
@@ -44,7 +45,6 @@ enum { MAX_SIZE_PATH = 256 };
 
 int load_textures(t_graphics* ctx, char* path_to_cur_dir)
 {
-	IMG_Init(IMG_INIT_PNG);
 	char filename[MAX_SIZE_PATH];
 	int txr_id = 0;
 	while (txr_id < TOTAL_TEXTURES)
@@ -81,8 +81,6 @@ error:
 
 t_texture load_texture(char* filename, t_graphics* ctx)
 {
-	IMG_Init(IMG_INIT_PNG);
-
 	t_texture texture = {NULL, 0, 0};
 
 	SDL_Surface* image = IMG_Load(filename);
@@ -103,4 +101,26 @@ t_texture load_texture(char* filename, t_graphics* ctx)
 void destroy_texture(t_texture texture)
 {
 	SDL_DestroyTexture(texture.texture);
+}
+
+t_texture load_font(char* text, char* fontname, t_graphics* ctx)
+{
+    t_texture font_texture = {NULL, 0, 0};
+    TTF_Font* font = TTF_OpenFont(fontname, 28);
+    if (!font) {
+        return font_texture;
+    }
+    SDL_Color text_color = {0,0,0,0};
+    SDL_Surface* txt_surf = TTF_RenderText_Blended(font , text, text_color);
+    if (txt_surf) {
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(ctx->renderer, txt_surf);
+        if (texture) {
+            font_texture.texture = texture;
+            font_texture.w = txt_surf->w;
+            font_texture.h = txt_surf->h;
+        }
+        SDL_FreeSurface(txt_surf);
+    }
+    TTF_CloseFont(font);
+    return font_texture;
 }

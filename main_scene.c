@@ -27,6 +27,12 @@ typedef struct s_main_scene
 	int8_t		players;
 } t_main_scene;
 
+void set_two_players(t_scene* s)
+{
+    t_main_scene* scene = (t_main_scene*)s;
+    scene->players = 2;
+}
+
 static void main_scene_preload(t_scene* scene, t_game_ctx* game_ctx);
 static void main_scene_create(t_scene* scene, t_game_ctx* game_ctx);
 static void main_scene_update(t_scene* scene, t_game_ctx* game_ctx);
@@ -64,7 +70,7 @@ t_scene* new_main_scene()
     
     scene->base_scene.methods = &methods;
 	scene->game_map = new_game_map();
-	scene->players = 2;
+	scene->players = 1;
 
     return (t_scene*)scene;
 }

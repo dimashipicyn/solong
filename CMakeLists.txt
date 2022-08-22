@@ -89,6 +89,7 @@ add_subdirectory(utils)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
 find_package(SDL2_ttf CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     utils
@@ -99,6 +100,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	SDL2::SDL2-static
 	SDL2::SDL2_image
 	SDL2_ttf::SDL2_ttf-static
+	SDL2_mixer::SDL2_mixer-static
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

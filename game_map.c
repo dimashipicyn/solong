@@ -255,7 +255,7 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
         }
         row++;
     }
-	if (orel.texture) {
+	if (orel.texture.texture) {
 		draw_sprite_to_frame(graphics, orel);
 	}
 }

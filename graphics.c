@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 
 #if 0
 static inline int get_pixel_texture(t_texture* texture, int x, int y)
@@ -125,8 +127,19 @@ t_graphics *init_graphics(int width, int height, char* title)
 {
     SDL_Window*		window = NULL;
 	SDL_Renderer*	renderer = NULL;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    
+    //Initialize PNG loading
+    int imgFlags = IMG_INIT_PNG;
+    if(!( IMG_Init( imgFlags ) & imgFlags ))
+    {
+        printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
+        return NULL;
+    }
+    
+    //Initialize SDL_ttf
+    if(TTF_Init() == -1)
+    {
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
         return NULL;
     }
 
@@ -147,6 +160,8 @@ t_graphics *init_graphics(int width, int height, char* title)
     *graphics = (t_graphics) {
         .window = window,
 		.renderer = renderer,
+        .w = width,
+        .h = height
     };
 
     return graphics;
@@ -166,5 +181,5 @@ void draw_sprite_to_frame(t_graphics* graphics, t_sprite sprite)
 {
 	SDL_Rect src = {sprite.src.pos.x, sprite.src.pos.y, sprite.src.size.x, sprite.src.size.y};
 	SDL_Rect dest = {sprite.dest.pos.x, sprite.dest.pos.y, sprite.dest.size.x, sprite.dest.size.y};
-	SDL_RenderCopy(graphics->renderer, sprite.texture->texture, &src, &dest);
+	SDL_RenderCopy(graphics->renderer, sprite.texture.texture, &src, &dest);
 }

@@ -8,7 +8,7 @@
 
 void draw_number(t_graphics* graphics, t_point dest, int32_t number)
 {
-    t_texture *texture = get_texture(DIGITS_TXR_ID);
+    t_texture texture = get_texture(DIGITS_TXR_ID);
 	int32_t w = 24;//texture->texture.width / 10;
 	int32_t h = 30;//texture->height;
     t_rect dst = {vec2(dest.x,dest.y),vec2(16,20)};
