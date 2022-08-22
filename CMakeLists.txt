@@ -44,6 +44,7 @@ set(SOURCE_FILES
     main_scene.c
 	command.c
 	menu_scene.c
+	editor_scene.c
 )
 
 set(HEADER_FILES 
@@ -64,6 +65,7 @@ set(HEADER_FILES
     main_scene.h
 	command.h
 	menu_scene.h
+	editor_scene.h
 )
 
 add_executable(solong 
@@ -86,6 +88,7 @@ add_subdirectory(utils)
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
+find_package(SDL2_ttf CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     utils
@@ -95,6 +98,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	SDL2::SDL2main
 	SDL2::SDL2-static
 	SDL2::SDL2_image
+	SDL2_ttf::SDL2_ttf-static
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

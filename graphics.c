@@ -126,7 +126,7 @@ t_graphics *init_graphics(int width, int height, char* title)
     SDL_Window*		window = NULL;
 	SDL_Renderer*	renderer = NULL;
 
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         return NULL;
     }
 

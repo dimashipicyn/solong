@@ -28,8 +28,8 @@ int loop_callback(void* data)
 	game_ctx->lag += game_ctx->elapsed;
 
     while (game_ctx->lag >= tick_time) {
+		step_physic_world();
         scene_update(game_ctx->active_scene, game_ctx);
-        step_physic_world();
         game_ctx->lag -= tick_time;
     }
 
