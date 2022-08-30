@@ -102,25 +102,3 @@ void destroy_texture(t_texture texture)
 {
 	SDL_DestroyTexture(texture.texture);
 }
-
-t_texture load_font(char* text, char* fontname, t_graphics* ctx)
-{
-    t_texture font_texture = {NULL, 0, 0};
-    TTF_Font* font = TTF_OpenFont(fontname, 28);
-    if (!font) {
-        return font_texture;
-    }
-    SDL_Color text_color = {0,0,0,0};
-    SDL_Surface* txt_surf = TTF_RenderText_Blended(font , text, text_color);
-    if (txt_surf) {
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(ctx->renderer, txt_surf);
-        if (texture) {
-            font_texture.texture = texture;
-            font_texture.w = txt_surf->w;
-            font_texture.h = txt_surf->h;
-        }
-        SDL_FreeSurface(txt_surf);
-    }
-    TTF_CloseFont(font);
-    return font_texture;
-}

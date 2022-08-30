@@ -84,6 +84,7 @@ void destroy_map(t_game_map* map)
 {
 	for (size_t i = 0; i < 28 * 28; i++) {
 		t_terrain* t = &map->tiles[i];
+		t->type = EMPTY;
 		if (t->body) {
 			free_physic_body(t->body);
 			t->body = NULL;
@@ -163,6 +164,8 @@ void destroy_terrain(t_game_map* map, int x, int y)
 
 int load_map(t_game_map* map, char* filename)
 {
+	destroy_map(map);
+
 	int fd;
 
 	fd = open(filename, O_RDONLY);
@@ -171,8 +174,6 @@ int load_map(t_game_map* map, char* filename)
 		printf("Dont open map!\n");
 		return 1;
 	}
-
-	destroy_map(map);
 
 	char buf[29] = {0};
 
@@ -194,7 +195,7 @@ int save_map(t_game_map* map, char* filename)
 {
 	int fd;
 
-	fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT);
+	fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd == -1)
 	{
 		printf("Dont open file: %s!\n", filename);
@@ -226,7 +227,8 @@ void draw_game_map(t_game_map* game_map, t_graphics* graphics)
     size_t col;
     t_terrain* tiles;
     
-    t_sprite orel = {0};
+    t_sprite orel;
+	orel.texture.texture = NULL;
 
     row = 0;
     tiles = game_map->tiles;

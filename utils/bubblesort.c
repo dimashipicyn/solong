@@ -1,11 +1,11 @@
 #include "utils.h"
 
-void	ut_bubblesort(void *array, int size, int len,
-int (*cmp)(void *, void *))
+void	ut_bubblesort(void *_array, int size, int len, int (*cmp)(void *, void *))
 {
 	int	max;
 	int	i;
 	int	issort;
+	unsigned char* array = _array;
 
 	max = size * len - size;
 	issort = 0;

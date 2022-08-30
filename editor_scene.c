@@ -12,9 +12,17 @@
 #include "texture.h"
 #include "game.h"
 #include "game_map.h"
+#include "fonts.h"
 
 #include <stdlib.h>
 #include <SDL.h>
+
+enum {
+	BUTTON_SAVE,
+	BUTTON_NEXT,
+	BUTTON_EXIT,
+	TOTAL_BUTTONS
+};
 
 typedef struct s_editor_scene
 {
@@ -22,7 +30,10 @@ typedef struct s_editor_scene
 	t_game_map* map;
 	t_tile_type type;
 	t_rect		materials[TILE_TYPE_SIZE];
+	t_font		font;
 	t_sprite	cursor;
+	t_sprite	buttons[TOTAL_BUTTONS];
+	int8_t		level;
 } t_editor_scene;
 
 static void editor_scene_preload(t_scene* scene, t_game_ctx* game_ctx);
@@ -70,13 +81,55 @@ void delete_editor_scene(t_scene* scene)
 void editor_scene_preload(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_editor_scene* scene = (t_editor_scene*)_scene;
-	//load_map(scene->map, "map.ber");
+	(void)game_ctx;
+
+//	char buf[256] = {0};
+//	sprintf(buf, "levels/level_%d.map", scene->level);
+//	load_map(scene->map, buf);
+
+	scene->font = load_font("assets/fonts/open-sans/OpenSans-Bold.ttf", 15);
+
+	t_color color = {200,200,200,0};
+
+	char* texts[] = {
+		"Save",
+		"Next",
+		"Exit"
+	};
+	for (int i = 0; i < TOTAL_BUTTONS; i++) {
+		int offset = i * 20;
+		t_texture txr = draw_text_to_texture(game_ctx->graphics, scene->font, texts[i], color);
+		scene->buttons[i] = (t_sprite){
+			txr,
+			{{455,300 + offset},{35,18}},
+			{{0,0},{txr.w,txr.h}}
+		};
+	}
+}
+
+static void save_level(t_editor_scene* scene)
+{
+	char buf[256] = {0};
+	sprintf(buf, "levels/level_%d.map", scene->level);
+	save_map(scene->map, buf);
+}
+
+static void load_next_level(t_editor_scene* scene)
+{
+	scene->level++;
+
+	char buf[256] = {0};
+	sprintf(buf, "levels/level_%d.map", scene->level);
+	load_map(scene->map, buf);
 }
 
 void editor_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_editor_scene* scene = (t_editor_scene*)_scene;
+	(void)game_ctx;
 
+	scene->level = -1;
+	load_next_level(scene);
 }
 
 static int check_map(int x, int y)
@@ -102,6 +155,18 @@ static int tile_intersect(t_editor_scene* scene, int x, int y)
 	return -1;
 }
 
+static int button_intersect(t_editor_scene* scene, int x, int y)
+{
+	for (int i = 0; i < TOTAL_BUTTONS; i++) {
+		t_rect dest = scene->buttons[i].dest;
+		if ((x > dest.pos.x) && (x < (dest.pos.x + dest.size.x))
+			&& (y > dest.pos.y) && (y < (dest.pos.y + dest.size.y))) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void editor_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 {
 	t_editor_scene* scene = (t_editor_scene*)_scene;
@@ -117,9 +182,21 @@ void editor_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 			scene->type = tile_type;
 			scene->cursor = scene->map->sprites[tile_type];
 		}
+
+		int button = button_intersect(scene, mouse.x, mouse.y);
+		if (button == BUTTON_SAVE) {
+			save_level(scene);
+		}
+		if (button == BUTTON_NEXT) {
+			load_next_level(scene);
+		}
+		if (button == BUTTON_EXIT) {
+			scene->level = 0;
+			game_ctx->active_scene = game_ctx->scenes[MENU_SCENE];
+		}
 	}
 	if (game_ctx->keys[SDL_SCANCODE_ESCAPE]) {
-		save_map(scene->map, "level_3.map");
+
 	}
 
 	scene->cursor.dest.pos = vec2(mouse.x - 8, mouse.y - 8);
@@ -137,6 +214,9 @@ void editor_scene_render(t_scene* _scene, t_game_ctx* game_ctx)
 		draw_sprite_to_frame(game_ctx->graphics, s);
 	}
 	draw_sprite_to_frame(game_ctx->graphics, scene->cursor);
+	for (int i = 0; i < TOTAL_BUTTONS; i++) {
+		draw_sprite_to_frame(game_ctx->graphics, scene->buttons[i]);
+	}
 }
 
 void editor_scene_free(t_scene* scene)

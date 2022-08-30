@@ -12,3 +12,4 @@ int load_settings(char* filename);
 t_settings* get_settings();
 
 #endif
+

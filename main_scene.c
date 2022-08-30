@@ -49,6 +49,8 @@ static t_scene_methods methods = {
 
 t_tank* tank_factory(t_main_scene* scene, t_vec2 pos)
 {
+	(void)scene;
+	
 	t_tank_def def;
 	def.pos = pos;
 	def.dir = vec2(0, -1);
@@ -169,6 +171,7 @@ void main_scene_create(t_scene* _scene, t_game_ctx* game_ctx)
 void main_scene_update(t_scene* _scene, t_game_ctx* game_ctx)
 {
     t_main_scene* scene = (t_main_scene*)_scene;
+	(void)game_ctx;
 
 	int64_t diff_time = get_time() - scene->last_spawn_time;
 	if (diff_time > 1000 && scene->tanks < 50) {

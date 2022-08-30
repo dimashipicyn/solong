@@ -52,3 +52,4 @@ t_vec2 vec2(float x, float y)
 {
     return (t_vec2){x, y};
 }
+

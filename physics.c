@@ -41,8 +41,10 @@ t_physic_world* new_physic_world()
 
 void free_physic_world(t_physic_world* w)
 {
-    ut_list_foreach(w->static_bodies, free_physic_body);
-    ut_list_foreach(w->dynamic_bodies, free_physic_body);
+	typedef void (*foreach_callback)(void*);
+
+    ut_list_foreach(w->static_bodies, (foreach_callback)free_physic_body);
+    ut_list_foreach(w->dynamic_bodies, (foreach_callback)free_physic_body);
     ut_list_clear(&w->static_bodies);
     ut_list_clear(&w->dynamic_bodies);
     free(w);
@@ -120,9 +122,9 @@ void step_physic_world()
                 body_1->contact = 1;
                 body_1->contacted_body = body_2;
 				body_1->velocity = 0;
-				body_2->contact = 1;
-				body_2->contacted_body = body_1;
-				body_2->velocity = 0;
+				//body_2->contact = 1;
+				//body_2->contacted_body = body_1;
+				//body_2->velocity = 0;
                 break;
             }
         }

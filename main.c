@@ -20,7 +20,7 @@ static const int32_t tick_time = 1000 / 60;
 int loop_callback(void* data)
 {
     t_game_ctx* game_ctx = (t_game_ctx*)data;
-    t_graphics* graphics = game_ctx->graphics;
+    //t_graphics* graphics = game_ctx->graphics;
     
     int64_t start = get_time();
     game_ctx->elapsed = start - game_ctx->previous_time;
@@ -34,7 +34,7 @@ int loop_callback(void* data)
     }
 
     scene_render(game_ctx->active_scene, game_ctx);
-    draw_framerate(graphics, game_ctx->elapsed);
+    //draw_framerate(graphics, game_ctx->elapsed);
 
     return 0;
 }
@@ -52,22 +52,20 @@ void loop(t_game_ctx* game)
     {
         SDL_PollEvent(&event);
 
+		game->mouse.is_press_l = 0;
+		game->mouse.is_press_r = 0;
         switch (event.type)
         {
             case SDL_QUIT:
                 quit = 1;
                 break;
+			case SDL_MOUSEMOTION:
+				SDL_GetMouseState(&game->mouse.x, &game->mouse.y);
+				break;
+			case SDL_MOUSEBUTTONUP:
+				game->mouse.is_press_l = 1;
+				break;
         }
-		if (event.type == SDL_MOUSEMOTION) {
-			SDL_GetMouseState(&game->mouse.x, &game->mouse.y);
-		}
-		game->mouse.is_press_l = 0;
-		if (event.type == SDL_MOUSEBUTTONUP) {
-			game->mouse.is_press_l = 1;
-		}
-		//if (event.type == SDL_MOUSEBUTTONDOWN) {
-		//	game->mouse.is_press_l = 0;
-		//}
 		
 		game->keys = SDL_GetKeyboardState(NULL);
 
@@ -137,7 +135,6 @@ t_game_ctx* init_game(char** env)
 
 	for (int i = 0; i < TOTAL_SCENES; i++) {
 		scene_preload(game->scenes[i], game);
-		scene_create(game->scenes[i], game);
 	}
 
 	game->active_scene = game->scenes[MENU_SCENE];
@@ -152,6 +149,9 @@ error:
 }
 
 int main(int ac, char** argv, char** env) {
+	(void)ac;
+	(void)argv;
+
     t_game_ctx* game = init_game(env);
     if (!game) {
         printf("Could not init game!\n");

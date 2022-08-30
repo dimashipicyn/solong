@@ -34,7 +34,6 @@ t_texture get_texture(t_texture_id id);
 void set_texture_filename(char* filename, t_texture_id id);
 
 t_texture load_texture(char* filename, t_graphics* ctx);
-t_texture load_font(char* text, char* fontname, t_graphics* ctx);
 void destroy_texture(t_texture texture);
 
 #endif

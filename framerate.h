@@ -11,3 +11,4 @@ void draw_number(t_graphics* graphics, t_point dest, int32_t number);
 void draw_framerate(t_graphics* graphics, int32_t elapsed_time);
 
 #endif
+

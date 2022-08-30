@@ -1,12 +1,11 @@
 set(VCPKG_ROOT_DIR "$ENV{VCPKG_ROOT}" CACHE PATH "VCPKG_ROOT_DIR")
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT_DIR}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING "")
+    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
 cmake_minimum_required(VERSION 3.0.0)
-project(solong)
+project(battle_city)
 
 add_compile_options(-Wall -Wextra -pedantic)
 
@@ -45,6 +44,7 @@ set(SOURCE_FILES
 	command.c
 	menu_scene.c
 	editor_scene.c
+	fonts.c
 )
 
 set(HEADER_FILES 
@@ -66,9 +66,10 @@ set(HEADER_FILES
 	command.h
 	menu_scene.h
 	editor_scene.h
+	fonts.h
 )
 
-add_executable(solong 
+add_executable(${PROJECT_NAME} 
     ${SOURCE_FILES}
     ${HEADER_FILES}
 )
